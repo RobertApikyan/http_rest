@@ -3,6 +3,7 @@ import 'dart:convert' as converter;
 import 'dart:io';
 
 import 'package:http/http.dart';
+import 'package:rest/rest.dart';
 
 import 'rest_abstract.dart';
 
@@ -134,6 +135,13 @@ class Delete extends RestMethod {
   String toString() => 'Delete';
 }
 
+class Patch extends RestMethod {
+  const Patch();
+
+  @override
+  String toString() => 'Patch';
+}
+
 /// Rest methods container
 class Methods {
   Methods._();
@@ -142,11 +150,13 @@ class Methods {
   static const get = Get();
   static const put = Put();
   static const delete = Delete();
+  static const patch = Patch();
 }
 
 // / Implements RequestExecutor using dart's http library
 class HttpRequestExecutor extends RequestExecutor {
-  HttpRequestExecutor(this.client,{this.timeOutDuration = const Duration(minutes: 5)});
+  HttpRequestExecutor(this.client,
+      {this.timeOutDuration = const Duration(minutes: 5)});
 
   final Client client;
 
@@ -193,6 +203,12 @@ class HttpRequestExecutor extends RequestExecutor {
       }
       if (request.method is Put) {
         response = await withTimeOut(client.put(uri,
+            headers: rowRequest.request.headers,
+            body: rowRequest.rowBody,
+            encoding: request.encoding));
+      }
+      if (request.method is Patch) {
+        response = await withTimeOut(client.patch(uri,
             headers: rowRequest.request.headers,
             body: rowRequest.rowBody,
             encoding: request.encoding));
@@ -261,8 +277,7 @@ class JsonToMapConverter extends ResponseConverter {
       final rowBodyUtf8 = converter.utf8.decode(rowBody);
       jsonMap = converter.json.decode(rowBodyUtf8);
     }
-    return RestResponse(
-        rowResponse.request, rowResponse, jsonMap);
+    return RestResponse(rowResponse.request, rowResponse, jsonMap);
   }
 }
 
@@ -275,15 +290,14 @@ class StringConverter extends ResponseConverter {
       final rowBodyUtf8 = converter.utf8.decode(rowBody);
       stringBody = rowBodyUtf8;
     }
-    return RestResponse(
-        rowResponse.request, rowResponse, stringBody);
+    return RestResponse(rowResponse.request, rowResponse, stringBody);
   }
 }
 
 class UInt8ListConverter extends ResponseConverter {
   @override
-  RestResponse fromRow(RowResponse rowResponse) => RestResponse(
-      rowResponse.request, rowResponse, rowResponse.rowBody);
+  RestResponse fromRow(RowResponse rowResponse) =>
+      RestResponse(rowResponse.request, rowResponse, rowResponse.rowBody);
 }
 
 // Common RestRequests
