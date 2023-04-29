@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:typed_data';
 
-import 'rest_abstract.dart';
+import 'package:rest/rest_io.dart';
+import 'package:rest/rest_method.dart';
+import 'package:rest/rest_middleware.dart';
 
 enum LogParts {
   headers,
@@ -14,14 +16,14 @@ enum LogParts {
 }
 
 /// Loggers
-class RequestLogger extends Middleware<RowRequest> {
+class RequestLogger extends RestMiddleware<RestRowRequest> {
   RequestLogger({this.logParts = LogParts.all});
 
   final Set<LogParts> logParts;
 
   @override
-  Future<RowRequest> onNext(
-      RowRequest row, Middleware<RowRequest> nextMiddleware) async {
+  Future<RestRowRequest> onNext(
+      RestRowRequest row, RestMiddleware<RestRowRequest> nextMiddleware) async {
     final request = row.request;
     final rowBody = row.rowBody;
 
@@ -47,14 +49,14 @@ class RequestLogger extends Middleware<RowRequest> {
   }
 }
 
-class ResponseLogger extends Middleware<RowResponse> {
+class ResponseLogger extends RestMiddleware<RestRowResponse> {
   ResponseLogger({this.logParts = LogParts.all});
 
   final Set<LogParts> logParts;
 
   @override
-  Future<RowResponse> onNext(
-      RowResponse row, Middleware<RowResponse> nextMiddleware) async {
+  Future<RestRowResponse> onNext(RestRowResponse row,
+      RestMiddleware<RestRowResponse> nextMiddleware) async {
     log('');
     logDivider();
     tabbedLog('← RESPONSE ←');
@@ -91,7 +93,7 @@ class ResponseLogger extends Middleware<RowResponse> {
   }
 }
 
-void _logUrl(RestMethod method, String url) {
+void _logUrl(RestMethods method, String url) {
   String endpoint = '${method.toString().toUpperCase()}: $url';
   tabbedLog(endpoint);
 }
