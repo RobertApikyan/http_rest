@@ -2,6 +2,7 @@ import 'package:http/http.dart';
 import 'package:rest/rest.dart';
 
 void main() {
+
   final client =
       RestClient.builder(DefaultRestRequestExecutor(Client())).build();
 
