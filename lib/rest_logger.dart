@@ -94,7 +94,7 @@ class ResponseLogger extends RestMiddleware<RestRowResponse> {
 }
 
 void _logUrl(RestMethods method, String url) {
-  String endpoint = '${method.toString().toUpperCase()}: $url';
+  String endpoint = '${method.name.toString().toUpperCase()}: $url';
   tabbedLog(endpoint);
 }
 

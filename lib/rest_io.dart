@@ -8,20 +8,20 @@ class RestRequest {
   RestRequest(
       {required this.method,
         required this.url,
-        required this.requestConverterTypes,
-        required this.responseConverterTypes,
+        this.requestConverterType,
+        this.responseConverterType,
         Map<String, String>? headers,
         this.body,
         this.encoding})
-      : this.headers = {...(headers ?? {})};
+      : headers = {...(headers ?? {})};
 
   final RestMethods method;
   final String url;
   final Map<String, String> headers;
   final dynamic body;
   final Encoding? encoding;
-  final List<Type> requestConverterTypes;
-  final List<Type> responseConverterTypes;
+  final Type? requestConverterType;
+  final Type? responseConverterType;
 }
 
 class RestRowRequest {

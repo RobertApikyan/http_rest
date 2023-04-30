@@ -1,17 +1,39 @@
 import 'dart:convert';
 
+import 'package:rest/rest.dart';
 import 'package:rest/rest_io.dart';
 
 abstract class RestRequestConverter {
+
+  factory RestRequestConverter.empty() => _EmptyRequestConverter();
+
+  RestRequestConverter();
+
   RestRowRequest toRow(RestRequest request);
 }
 
 abstract class RestResponseConverter {
+
+  factory RestResponseConverter.empty() => _EmptyResponseConverter();
+
+  RestResponseConverter();
+
   RestResponse fromRow(RestRowResponse rowResponse);
 }
 
+class _EmptyRequestConverter extends RestRequestConverter {
+  @override
+  RestRowRequest toRow(RestRequest request) => RestRowRequest(request, request.body, request.encoding);
+}
+
+class _EmptyResponseConverter extends RestResponseConverter {
+  @override
+  RestResponse fromRow(RestRowResponse rowResponse) =>
+      RestResponse(rowResponse.request, rowResponse, rowResponse.rowBody);
+}
+
 /// Convert RowRequest <-> RowResponse using dart's json converter
-class MapToJsonConverter extends RestRequestConverter {
+class MapToJsonRequestConverter extends RestRequestConverter {
   @override
   RestRowRequest toRow(RestRequest request) {
     String? jsonBody;
@@ -28,7 +50,7 @@ class MapToJsonConverter extends RestRequestConverter {
   }
 }
 
-class JsonToMapConverter extends RestResponseConverter {
+class JsonToMapResponseConverter extends RestResponseConverter {
   @override
   RestResponse fromRow(RestRowResponse rowResponse) {
     dynamic jsonMap;
@@ -41,7 +63,7 @@ class JsonToMapConverter extends RestResponseConverter {
   }
 }
 
-class StringConverter extends RestResponseConverter {
+class StringResponseConverter extends RestResponseConverter {
   @override
   RestResponse fromRow(RestRowResponse rowResponse) {
     String? stringBody;
@@ -54,8 +76,4 @@ class StringConverter extends RestResponseConverter {
   }
 }
 
-class UInt8ListConverter extends RestResponseConverter {
-  @override
-  RestResponse fromRow(RestRowResponse rowResponse) =>
-      RestResponse(rowResponse.request, rowResponse, rowResponse.rowBody);
-}
+

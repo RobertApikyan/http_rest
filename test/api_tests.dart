@@ -8,7 +8,5 @@ void main() {
 
   client.execute(RestRequest(
       method: RestMethods.post,
-      url: '',
-      requestConverterTypes: [],
-      responseConverterTypes: []));
+      url: '',));
 }

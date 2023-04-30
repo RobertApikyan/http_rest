@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:rest/rest_converter.dart';
 import 'package:rest/rest_io.dart';
 import 'package:rest/rest_middleware.dart';
@@ -19,36 +20,28 @@ class RestClient {
       RestMiddleware<RestRowResponse>();
 
   Future<RestResponse> execute(RestRequest restRequest) async {
-    List<RestRequestConverter> requestConverters = restRequest
-        .requestConverterTypes
-        .map((converterType) => _requestConverterForType(converterType))
-        .toList();
 
-    List<RestResponseConverter> responseConverters = restRequest
-        .responseConverterTypes
-        .map((converterType) => _responseConverterForType(converterType))
-        .toList();
+    RestRequestConverter requestConverters = _requestConverterForType(restRequest.requestConverterType);
 
-    RestRowRequest? rowRequest;
-    for (final requestConverter in requestConverters) {
-      rowRequest = requestConverter.toRow(restRequest);
-    }
+    RestResponseConverter responseConverters = _responseConverterForType(restRequest.responseConverterType);
 
-    rowRequest = await _requestMiddleware.next(rowRequest!);
+    RestRowRequest? rowRequest = requestConverters.toRow(restRequest);
+
+    rowRequest = await _requestMiddleware.next(rowRequest);
 
     RestRowResponse rowResult = await _rowRequestExecutor.execute(rowRequest);
 
     rowResult = await _responseMiddleware.next(rowResult);
 
-    RestResponse? response;
-    for(final responseConverter in responseConverters) {
-      response = responseConverter.fromRow(rowResult);
-    }
+    RestResponse? response = responseConverters.fromRow(rowResult);
 
-    return response!;
+    return response;
   }
 
-  RestRequestConverter _requestConverterForType(Type converterType) {
+  RestRequestConverter _requestConverterForType(Type? converterType) {
+    if(converterType == null){
+      return RestRequestConverter.empty();
+    }
     RestRequestConverter? converter = _requestConverters[converterType];
     if (converter != null) {
       return converter;
@@ -58,7 +51,10 @@ class RestClient {
     }
   }
 
-  RestResponseConverter _responseConverterForType(Type converterType) {
+  RestResponseConverter _responseConverterForType(Type? converterType) {
+    if(converterType == null){
+      return RestResponseConverter.empty();
+    }
     RestResponseConverter? converter = _responseConverters[converterType];
     if (converter != null) {
       return converter;
