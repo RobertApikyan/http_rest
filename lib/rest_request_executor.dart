@@ -36,7 +36,7 @@ class DefaultRestRequestExecutor extends RestRequestExecutor {
       final multipartRequestBody = request.body as MultipartRestRequestBody;
 
       final multipartRequest = ProgressedMultipartRequest(
-          request.method.toString(), uri,
+          request.method.name, uri,
           onProgress: multipartRequestBody.progressListener);
 
       multipartRequest.fields.addAll(multipartRequestBody.fields);
