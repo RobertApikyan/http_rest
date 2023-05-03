@@ -57,8 +57,10 @@ class ResponseLogger extends RestMiddleware<RestRowResponse> {
   @override
   Future<RestRowResponse> onNext(RestRowResponse row,
       RestMiddleware<RestRowResponse> nextMiddleware) async {
+    String logText = '';
     log('');
-    logDivider();
+    // logDivider();
+
     tabbedLog('← RESPONSE ←');
 
     if (logParts.contains(LogParts.url)) {
@@ -113,7 +115,7 @@ void _logBody(dynamic rowBody) {
   if (body.isEmpty) {
     tabbedLog('BODY:\tEMPTY');
   } else {
-    tabbedLog('BODY:\t$body');
+    tabbedLog('BODY:\n\t$body');
   }
 }
 

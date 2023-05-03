@@ -1,4 +1,4 @@
-/// Rest methods
+/// Represents the rest methods
 enum RestMethods {
   get,
   post,

@@ -5,15 +5,38 @@ import 'package:rest/rest_io.dart';
 import 'package:rest/rest_middleware.dart';
 import 'package:rest/rest_request_executor.dart';
 
+/// This is the main class which wires converters, middlewares and request
+/// executors together. To create an instance of [RestClient] use the [RestClient.builder] method
+/// and provide a [RestRequestExecutor]'s implementation, the "rest" library ships with a
+/// default implementation [DefaultRestRequestExecutor], you can use it or create your own
+/// implementation of [RestRequestExecutor].
+/// After calling the [RestClient.builder] provide request/response converters and
+/// middlewares.
+///
+/// Here is an example on how to build a [RestClient]
+/// final RestClient client =
+///       RestClient.builder(DefaultRestRequestExecutor(Client()))
+///           .addRequestConverter(MapToJsonRequestConverter())
+///           .addResponseConverter(JsonToMapResponseConverter())
+///           .addResponseMiddleware(ResponseLogger())
+///           .addRequestMiddleware(RequestLogger())
+///           .build();
+/// ```
+///
+/// Library ships with the most required request/response converters such as
+/// JSON to Map [JsonToMapResponseConverter] and Map to JSON [MapToJsonRequestConverter] converters
+/// for more check the [rest_converter].
+/// There are default logging middlewares for requests and responses,
+/// see [RequestLogger] and [ResponseLogger] ... TODO CONTINUE
 class RestClient {
-  RestClient._(this._rowRequestExecutor);
+  RestClient._(this._restRequestExecutor);
 
   static RestClientBuilder builder(RestRequestExecutor requestExecutor) =>
       RestClientBuilder._(requestExecutor);
 
   final Map<Type, RestRequestConverter> _requestConverters = {};
   final Map<Type, RestResponseConverter> _responseConverters = {};
-  final RestRequestExecutor _rowRequestExecutor;
+  final RestRequestExecutor _restRequestExecutor;
   final RestMiddleware<RestRowRequest> _requestMiddleware =
       RestMiddleware<RestRowRequest>();
   final RestMiddleware<RestRowResponse> _responseMiddleware =
@@ -29,7 +52,7 @@ class RestClient {
 
     rowRequest = await _requestMiddleware.next(rowRequest);
 
-    RestRowResponse rowResult = await _rowRequestExecutor.execute(rowRequest);
+    RestRowResponse rowResult = await _restRequestExecutor.execute(rowRequest);
 
     rowResult = await _responseMiddleware.next(rowResult);
 
