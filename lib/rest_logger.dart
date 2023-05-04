@@ -82,11 +82,11 @@ class ResponseLogger extends RestMiddleware<RestRowResponse> {
     if (logParts.contains(LogParts.body)) {
       String? textBody;
       try {
-        textBody = utf8.decode(row.rowBody!);
+        textBody = utf8.decode(row.bodyBytes!);
       } on Exception {
         //ignore
       }
-      _logBody(textBody ?? row.rowBody);
+      _logBody(textBody ?? row.bodyBytes);
     }
 
     logDivider();

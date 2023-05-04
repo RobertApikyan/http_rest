@@ -3,6 +3,11 @@ import 'dart:convert';
 import 'package:rest/rest.dart';
 import 'package:rest/rest_io.dart';
 
+/// This class is a base request converter definition, derive from this class
+/// and implement the [toRow] method, which responsibility is to convert the
+/// [RestRequest] to [RestRowResponse]. The library ships with pre defined
+/// request converters such as [MapToJsonRequestConverter], which converts the
+/// body [Map] provided by [RestRequest.body] to JSON [String].
 abstract class RestRequestConverter {
 
   factory RestRequestConverter.empty() => _EmptyRequestConverter();
@@ -12,6 +17,12 @@ abstract class RestRequestConverter {
   RestRowRequest toRow(RestRequest request);
 }
 
+/// This class is a base response converter definition, derive from this class
+/// and implement the [fromRow] method, which responsibility is to convert the
+/// [RestRowResponse] to [RestResponse]. The library ships with pre defined
+/// response converters such as [JsonToMapResponseConverter], which converts the
+/// received body bytes from [RestRowResponse.bodyBytes] to [Map] representation of
+/// JSON result.
 abstract class RestResponseConverter {
 
   factory RestResponseConverter.empty() => _EmptyResponseConverter();
@@ -23,16 +34,19 @@ abstract class RestResponseConverter {
 
 class _EmptyRequestConverter extends RestRequestConverter {
   @override
-  RestRowRequest toRow(RestRequest request) => RestRowRequest(request, request.body, request.encoding);
+  RestRowRequest toRow(RestRequest request) => RestRowRequest(request, request.body);
 }
 
 class _EmptyResponseConverter extends RestResponseConverter {
   @override
   RestResponse fromRow(RestRowResponse rowResponse) =>
-      RestResponse(rowResponse.request, rowResponse, rowResponse.rowBody);
+      RestResponse(rowResponse.request, rowResponse, rowResponse.bodyBytes);
 }
 
-/// Convert RowRequest <-> RowResponse using dart's json converter
+/// [MapToJsonRequestConverter], which converts the
+/// body [Map] provided by [RestRequest.body] to JSON [String],
+/// it uses the [JsonCodec] from dart.convert library to encode
+/// the provided [RestRequest.body] to JSON string.
 class MapToJsonRequestConverter extends RestRequestConverter {
   @override
   RestRowRequest toRow(RestRequest request) {
@@ -46,15 +60,19 @@ class MapToJsonRequestConverter extends RestRequestConverter {
     } else {
       jsonBody = '';
     }
-    return RestRowRequest(request, jsonBody, request.encoding);
+    return RestRowRequest(request, jsonBody);
   }
 }
 
+/// [JsonToMapResponseConverter] converts the
+/// received body bytes from [RestRowResponse.bodyBytes] to [Map] representation of
+/// JSON result.class, it uses the [JsonCodec] from dart.convert library to decode
+/// the json result.
 class JsonToMapResponseConverter extends RestResponseConverter {
   @override
   RestResponse fromRow(RestRowResponse rowResponse) {
     dynamic jsonMap;
-    final rowBody = rowResponse.rowBody;
+    final rowBody = rowResponse.bodyBytes;
     if (rowBody != null && rowBody.isNotEmpty) {
       final rowBodyUtf8 = utf8.decode(rowBody);
       jsonMap = json.decode(rowBodyUtf8);
@@ -63,11 +81,13 @@ class JsonToMapResponseConverter extends RestResponseConverter {
   }
 }
 
+/// This response converter converts the response [RestRowResponse.bodyBytes] to
+/// utf8 encoded string.
 class StringResponseConverter extends RestResponseConverter {
   @override
   RestResponse fromRow(RestRowResponse rowResponse) {
     String? stringBody;
-    final rowBody = rowResponse.rowBody;
+    final rowBody = rowResponse.bodyBytes;
     if (rowBody != null) {
       final rowBodyUtf8 = utf8.decode(rowBody);
       stringBody = rowBodyUtf8;

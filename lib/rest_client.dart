@@ -26,11 +26,17 @@ import 'package:rest/rest_request_executor.dart';
 /// Library ships with the most required request/response converters such as
 /// JSON to Map [JsonToMapResponseConverter] and Map to JSON [MapToJsonRequestConverter] converters
 /// for more check the [rest_converter].
-/// There are default logging middlewares for requests and responses,
-/// see [RequestLogger] and [ResponseLogger] ... TODO CONTINUE
+/// There are default logging middlewares for requests and responses which ships with
+/// the library, see [RequestLogger] and [ResponseLogger].
 class RestClient {
   RestClient._(this._restRequestExecutor);
 
+  /// This method is the entry point to start create a [RestClient],
+  /// [RestRequestExecutor] should be provided as a parameter, which mainly executes
+  /// the requests, [DefaultRestRequestExecutor] can be used for that which handles
+  /// most of the cases for regular and multipart requests.
+  /// Returns [RestClientBuilder] which provide a methods to add middlewares and
+  /// request/response converters to [RestClient] instance.
   static RestClientBuilder builder(RestRequestExecutor requestExecutor) =>
       RestClientBuilder._(requestExecutor);
 
@@ -42,13 +48,28 @@ class RestClient {
   final RestMiddleware<RestRowResponse> _responseMiddleware =
       RestMiddleware<RestRowResponse>();
 
+  /// Use this method to execute requests,
+  /// Receives a single argument of [RestRequest], which represents the requests
+  /// parameters, and returns [RestResponse] as a result.
+  /// When you are calling the [RestClient.execute] method the ordering of the request pipeline is the following,
+  ///
+  /// [RestClient.execute] -> [RestRequestConverter.toRow] -> [RestMiddleware.next] -> [RestRequestExecutor.execute] -> [RestMiddleware.next] -> [RestResponseConverter.fromRow]
+  ///
+  /// Here are the descriptions of each pace in the request execution.
+  /// [RestClient.execute] starts the request.
+  /// [RestRequestConverter.toRow] converts the [RestRequest] to [RestRowRequest].
+  /// [RestMiddleware.next] this calls all the request middlewares in the chain.
+  /// [RestRequestExecutor.execute] handle the http request and returns [RestRowResponse].
+  /// [RestMiddleware.next] this calls all the response middlewares in the chain.
+  /// [RestResponseConverter.fromRow] converts the [RestRowRequest] to [RestRequest].
+  /// eventually returns the result.
   Future<RestResponse> execute(RestRequest restRequest) async {
 
-    RestRequestConverter requestConverters = _requestConverterForType(restRequest.requestConverterType);
+    RestRequestConverter requestConverter = _requestConverterForType(restRequest.requestConverterType);
 
-    RestResponseConverter responseConverters = _responseConverterForType(restRequest.responseConverterType);
+    RestResponseConverter responseConverter = _responseConverterForType(restRequest.responseConverterType);
 
-    RestRowRequest? rowRequest = requestConverters.toRow(restRequest);
+    RestRowRequest? rowRequest = requestConverter.toRow(restRequest);
 
     rowRequest = await _requestMiddleware.next(rowRequest);
 
@@ -56,7 +77,7 @@ class RestClient {
 
     rowResult = await _responseMiddleware.next(rowResult);
 
-    RestResponse? response = responseConverters.fromRow(rowResult);
+    RestResponse? response = responseConverter.fromRow(rowResult);
 
     return response;
   }
@@ -96,28 +117,34 @@ class RestClientBuilder {
 
   late final RestClient _client;
 
+  /// Use this method to add request converters to [RestClient]
   RestClientBuilder addRequestConverter(RestRequestConverter converter) {
     _client._requestConverters[converter.runtimeType] = converter;
     return this;
   }
 
+  /// Use this method to add response converters to [RestClient]
   RestClientBuilder addResponseConverter(RestResponseConverter converter) {
     _client._responseConverters[converter.runtimeType] = converter;
     return this;
   }
 
+  /// Use this method to add request middlewares to [RestClient]
   RestClientBuilder addRequestMiddleware(
       RestMiddleware<RestRowRequest> middleware) {
     _client._requestMiddleware.addNext(middleware);
     return this;
   }
 
+  /// Use this method to add response middlewares to [RestClient]
   RestClientBuilder addResponseMiddleware(
       RestMiddleware<RestRowResponse> middleware) {
     _client._responseMiddleware.addNext(middleware);
     return this;
   }
 
+  /// Call this method at the end of the [RestClient] configuration to get
+  /// the [RestClient]'s instance.
   RestClient build() {
     // add
     _client._responseMiddleware.addNext(RestMiddleware());
