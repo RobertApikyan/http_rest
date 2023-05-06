@@ -1,7 +1,6 @@
 import 'dart:convert';
 
-import 'package:rest/rest.dart';
-import 'package:rest/rest_io.dart';
+import 'package:apex/apex_io.dart';
 
 /// This class is a base request converter definition, derive from this class
 /// and implement the [toRow] method, which responsibility is to convert the

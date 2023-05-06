@@ -2,10 +2,13 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:typed_data';
 
-import 'package:rest/rest_io.dart';
-import 'package:rest/rest_method.dart';
-import 'package:rest/rest_middleware.dart';
+import 'apex_io.dart';
+import 'apex_method.dart';
+import 'apex_middleware.dart';
 
+
+/// This enum can be used to specify which part of the request need to logged
+/// by [RequestLogger] and [ResponseLogger]
 enum LogParts {
   headers,
   body,
@@ -15,7 +18,28 @@ enum LogParts {
   static const all = {url, headers, code, body};
 }
 
-/// Loggers
+/// The [RequestLogger] is a default logger implementation for the requests.
+/// Here is how the logged request's structure looks like.
+///
+/// → REQUEST →
+/// <rest method>: <URL>
+/// HEADERS:	<header1> : <value>
+/// 				  <header2> : <value>
+/// BODY:	<body text or bytes>
+///
+/// Here is how real logged PUT request looks like in the console.
+///  -------------------------------------------------------------------------------------------------------------------
+///  → REQUEST →
+///  PUT: https://example.com/api/v1/user/324234
+///  HEADERS:	Content-Type : application/json
+///				  Authorization : eyJhbGciOi....
+/// 				Language : EN
+/// 				Version : 1.1.76
+///
+///  BODY:	{"firstName":"Joe"}
+///  -------------------------------------------------------------------------------------------------------------------
+/// The [RequestLogger] is a descendant of [RestMiddleware], you can derive from
+/// the [RestMiddleware] and create you own request logger.
 class RequestLogger extends RestMiddleware<RestRowRequest> {
   RequestLogger({this.logParts = LogParts.all});
 
@@ -49,6 +73,34 @@ class RequestLogger extends RestMiddleware<RestRowRequest> {
   }
 }
 
+/// The [ResponseLogger] is a default logger implementation for the responses.
+/// Here is how the logged response's structure looks like.
+///
+///  ← RESPONSE ←
+///  <rest method>: <URL>
+///  CODE: <value>
+///  HEADERS:	<header1> : <value>
+/// 				  <header2> : <value>
+///
+///  BODY:	<body text or bytes>
+///
+/// Here is how real logged PUT request's response looks like in the console.
+/// -------------------------------------------------------------------------------------------------------------------
+///  ← RESPONSE ←
+///  PUT: https://example.com/api/v1/user/324234
+///  CODE: 200
+///  HEADERS:	connection : keep-alive
+/// 				date : Thu, 04 May 2023 19:02:10 GMT
+/// 				transfer-encoding : chunked
+/// 				vary : accept-encoding
+/// 				content-encoding : gzip
+/// 				strict-transport-security : max-age=15724800; includeSubDomains
+/// 				content-type : application/json
+///
+///  BODY:  {"message":"Success"}
+///  -------------------------------------------------------------------------------------------------------------------
+/// The [ResponseLogger] is a descendant of [RestMiddleware], you can derive from
+/// the [RestMiddleware] and create you own response logger.
 class ResponseLogger extends RestMiddleware<RestRowResponse> {
   ResponseLogger({this.logParts = LogParts.all});
 
@@ -57,9 +109,8 @@ class ResponseLogger extends RestMiddleware<RestRowResponse> {
   @override
   Future<RestRowResponse> onNext(RestRowResponse row,
       RestMiddleware<RestRowResponse> nextMiddleware) async {
-    String logText = '';
     log('');
-    // logDivider();
+    logDivider();
 
     tabbedLog('← RESPONSE ←');
 

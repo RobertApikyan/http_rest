@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:rest/rest.dart';
+import 'apex_method.dart';
 
 /// This class represents the properties of rest request
 /// it allows to configure request's [method], URL path by [url], [headers],

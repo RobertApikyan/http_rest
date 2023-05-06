@@ -1,11 +1,13 @@
 // / Implements RequestExecutor using dart's http library
+import 'dart:async';
 import 'dart:io';
 
 import 'package:http/http.dart';
-import 'package:rest/reset_multipart_request.dart';
-import 'package:rest/rest_client.dart';
-import 'package:rest/rest_io.dart';
-import 'package:rest/rest_method.dart';
+
+import 'apex_io.dart';
+import 'apex_method.dart';
+import 'apex_multipart_request.dart';
+
 
 /// This abstract class is the main handler for http calls.
 /// Derive from this class and implement the [execute] method, which receives
@@ -60,7 +62,7 @@ class DefaultRestRequestExecutor extends RestRequestExecutor {
     if (request.body is MultipartRestRequestBody) {
       final multipartRequestBody = request.body as MultipartRestRequestBody;
 
-      final multipartRequest = ProgressedMultipartRequest(
+      final multipartRequest = _ProgressedMultipartRequest(
           request.method.name, uri,
           onProgress: multipartRequestBody.progressListener);
 
@@ -147,5 +149,41 @@ extension _ClientExtentions on Client {
     request.body = body;
 
     return Response.fromStream(await send(request));
+  }
+}
+
+class _ProgressedMultipartRequest extends MultipartRequest {
+  /// Creates a new [_ProgressedMultipartRequest].
+  _ProgressedMultipartRequest(
+    String method,
+    Uri url, {
+    required this.onProgress,
+  }) : super(method, url);
+
+  late final void Function(int bytes, int totalBytes)? onProgress;
+
+  /// Freezes all mutable fields and returns a single-subscription [ByteStream]
+  /// that will emit the request body.
+  @override
+  ByteStream finalize() {
+    final byteStream = super.finalize();
+    final onProgress = this.onProgress;
+    if (onProgress == null) {
+      return byteStream;
+    }
+
+    final total = contentLength;
+    int bytes = 0;
+
+    final t = StreamTransformer.fromHandlers(
+      handleData: (List<int> data, EventSink<List<int>> sink) {
+        bytes += data.length;
+        onProgress(bytes, total);
+        sink.add(data);
+      },
+    );
+
+    final stream = byteStream.transform(t);
+    return ByteStream(stream);
   }
 }

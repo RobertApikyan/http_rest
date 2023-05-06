@@ -1,39 +1,32 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+REST Request Library
+Build Status
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages).
+A library for making REST requests to APIs.
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages).
--->
+Installation
+To use this library in your project, add the following to your pubspec.yaml file:
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+yaml
+Copy code
+dependencies:
+library_name: ^1.0.0
+Then run flutter pub get to install the package.
 
-## Features
+Usage
+Here's an example of how to use this library to make a GET request to the JSONPlaceholder API:
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+dart
+Copy code
+import 'package:library_name/library_name.dart';
 
-## Getting started
+void fetchData() async {
+final response = await RestClient.get('https://jsonplaceholder.typicode.com/posts/1');
+print(response.body);
+}
+In this example, we're using the get method from the RestClient class to make a GET request to the JSONPlaceholder API.
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+Documentation
+For more information on how to use this library, please refer to the documentation.
 
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
-
-```dart
-const like = 'sample';
-```
-
-## Additional information
-
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+Contributing
+If you find any bugs or have feature requests, please file an issue or submit a pull request on the GitHub repository. We welcome any contributions that improve the functionality of this library.

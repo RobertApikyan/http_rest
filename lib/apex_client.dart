@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:rest/rest_converter.dart';
-import 'package:rest/rest_io.dart';
-import 'package:rest/rest_middleware.dart';
-import 'package:rest/rest_request_executor.dart';
+import 'package:apex/apex_converter.dart';
+import 'package:apex/apex_io.dart';
+import 'package:apex/apex_middleware.dart';
+import 'package:apex/apex_request_executor.dart';
 
 /// This is the main class which wires converters, middlewares and request
 /// executors together. To create an instance of [RestClient] use the [RestClient.builder] method

@@ -1,4 +1,3 @@
-import 'package:rest/rest.dart';
 
 /// The descendant of this class can be used as a request or response middleware.
 /// For the request middleware specify the [R] generic type as a[RestRowRequest],

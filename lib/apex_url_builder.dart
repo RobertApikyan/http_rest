@@ -1,4 +1,5 @@
 
+
 class RestUrlBuilder {
   late final String _base;
   late final String _url;
@@ -112,7 +113,24 @@ class QueryEntryHandler extends RestUrlEntryHandler<Query> {
   String _nextQuery(String name, String value) => '$_end$name=$value';
 }
 
-/// URL builder with PATH and QUERY
+/// This class is a helper for URL path manipulations. It provides a way to keep
+/// the base url, then add a request path to it and apply some query and path
+/// params to it.
+/// Here is the example usage of it.
+/// ```dart
+/// UrlBuilder get baseUrl => UrlBuilder.base('https://example.com');
+///
+/// final requestUrl = baseUrl
+///               .url('users/{userId}/documents/{documentId}')
+///               .addPath('userId', '123')
+///               .addPath('documentId', '456')
+///               .addQuery('type', 'education')
+///               .addQuery('name', 'calculus')
+///               .toString()
+///
+/// The value of requestUrl will be
+/// https://example.com/users/123/documents/456?type=education&name=calculus
+///
 class UrlBuilder extends RestUrlBuilder {
   UrlBuilder.base(String base) {
     super.base(base);
