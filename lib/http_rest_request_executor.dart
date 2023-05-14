@@ -2,22 +2,18 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:apex/apex.dart';
+import 'package:http_rest/http_rest.dart';
 import 'package:http/http.dart';
-
-import 'apex_io.dart';
-import 'apex_method.dart';
-import 'apex_multipart_request.dart';
 
 /// This abstract class is the main handler for http calls.
 /// Derive from this class and implement the [execute] method, which receives
 /// the [RowRequest] as an argument and returns [RowResponse] as a result.
 /// The actual http call should happen in the [execute] method's body.
-/// To create a [ApexClient] instance, first and foremost you will need to provide an implementation of
-/// [RequestExecutor] to [ApexClient.builder] as shown in the example below.
+/// To create a [HttpRestClient] instance, first and foremost you will need to provide an implementation of
+/// [RequestExecutor] to [HttpRestClient.builder] as shown in the example below.
 /// ```dart
-/// final ApexClient client =
-///       ApexClient.builder(DefaultRequestExecutor(Client()))
+/// final HttpRestClient client =
+///       HttpRestClient.builder(DefaultRequestExecutor(Client()))
 ///           .addRequestConverter(MapToJsonRequestConverter())
 ///           .addResponseConverter(JsonToMapResponseConverter())
 ///           .addResponseMiddleware(ResponseLogger())
@@ -116,7 +112,7 @@ class DefaultRequestExecutor extends RequestExecutor {
     return rowResponse;
   }
 
-  RowResponse _fromHttpResponse(Response? response, ApexRequest request) {
+  RowResponse _fromHttpResponse(Response? response, HttpRestRequest request) {
     if (response != null) {
       return RowResponse(
           request,

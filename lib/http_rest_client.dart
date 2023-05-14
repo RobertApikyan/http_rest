@@ -1,21 +1,21 @@
 import 'dart:async';
 
-import 'package:apex/apex_converter.dart';
-import 'package:apex/apex_io.dart';
-import 'package:apex/apex_middleware.dart';
-import 'package:apex/apex_request_executor.dart';
+import 'package:http_rest/http_rest_converter.dart';
+import 'package:http_rest/http_rest_io.dart';
+import 'package:http_rest/http_rest_middleware.dart';
+import 'package:http_rest/http_rest_request_executor.dart';
 
 /// This is the main class which wires converters, middlewares and request
-/// executors together. To create an instance of [ApexClient] use the [ApexClient.builder] method
-/// and provide a [RequestExecutor]'s implementation, the "apex" library ships with a
+/// executors together. To create an instance of [HttpRestClient] use the [HttpRestClient.builder] method
+/// and provide a [RequestExecutor]'s implementation, the "HttpRest" library ships with a
 /// default implementation [DefaultRequestExecutor], you can use it or create your own
 /// implementation of [RequestExecutor].
-/// After calling the [ApexClient.builder] provide request/response converters and
+/// After calling the [HttpRestClient.builder] provide request/response converters and
 /// middlewares.
 ///
-/// Here is an example on how to build a [ApexClient]
-/// final ApexClient client =
-///       ApexClient.builder(DefaultRequestExecutor(Client()))
+/// Here is an example on how to build a [HttpRestClient]
+/// final HttpRestClient client =
+///       HttpRestClient.builder(DefaultRequestExecutor(Client()))
 ///           .addRequestConverter(MapToJsonRequestConverter())
 ///           .addResponseConverter(JsonToMapResponseConverter())
 ///           .addResponseMiddleware(ResponseLogger())
@@ -25,20 +25,20 @@ import 'package:apex/apex_request_executor.dart';
 ///
 /// Library ships with the most required request/response converters such as
 /// JSON to Map [JsonToMapResponseConverter] and Map to JSON [MapToJsonRequestConverter] converters
-/// for more check the [apex_converter].
+/// for more check the [HttpRest_converter].
 /// There are default logging middlewares for requests and responses which ships with
 /// the library, see [RequestLogger] and [ResponseLogger].
-class ApexClient {
-  ApexClient._(this._requestExecutor);
+class HttpRestClient {
+  HttpRestClient._(this._requestExecutor);
 
-  /// This method is the entry point to start create a [ApexClient],
+  /// This method is the entry point to start create a [HttpRestClient],
   /// [RequestExecutor] should be provided as a parameter, which mainly executes
   /// the requests, [DefaultRequestExecutor] can be used for that which handles
   /// most of the cases for regular and multipart requests.
-  /// Returns [ApexClientBuilder] which provide a methods to add middlewares and
-  /// request/response converters to [ApexClient] instance.
-  static ApexClientBuilder builder(RequestExecutor requestExecutor) =>
-      ApexClientBuilder._(requestExecutor);
+  /// Returns [HttpRestClientBuilder] which provide a methods to add middlewares and
+  /// request/response converters to [HttpRestClient] instance.
+  static HttpRestClientBuilder builder(RequestExecutor requestExecutor) =>
+      HttpRestClientBuilder._(requestExecutor);
 
   final Map<Type, RequestConverter> _requestConverters = {};
   final Map<Type, ResponseConverter> _responseConverters = {};
@@ -49,21 +49,21 @@ class ApexClient {
       Middleware<RowResponse>();
 
   /// Use this method to execute requests,
-  /// Receives a single argument of [ApexRequest], which represents the requests
-  /// parameters, and returns [ApexResponse] as a result.
-  /// When you are calling the [ApexClient.execute] method the ordering of the request pipeline is the following,
+  /// Receives a single argument of [HttpRestRequest], which represents the requests
+  /// parameters, and returns [HttpRestResponse] as a result.
+  /// When you are calling the [HttpRestClient.execute] method the ordering of the request pipeline is the following,
   ///
-  /// [ApexClient.execute] -> [RequestConverter.toRow] -> [Middleware.next] -> [RequestExecutor.execute] -> [Middleware.next] -> [ResponseConverter.fromRow]
+  /// [HttpRestClient.execute] -> [RequestConverter.toRow] -> [Middleware.next] -> [RequestExecutor.execute] -> [Middleware.next] -> [ResponseConverter.fromRow]
   ///
   /// Here are the descriptions of each pace in the request execution.
-  /// [ApexClient.execute] starts the request.
-  /// [RequestConverter.toRow] converts the [ApexRequest] to [RowRequest].
+  /// [HttpRestClient.execute] starts the request.
+  /// [RequestConverter.toRow] converts the [HttpRestRequest] to [RowRequest].
   /// [Middleware.next] this calls all the request middlewares in the chain.
   /// [RequestExecutor.execute] handle the http request and returns [RowResponse].
   /// [Middleware.next] this calls all the response middlewares in the chain.
-  /// [ResponseConverter.fromRow] converts the [RowRequest] to [ApexRequest].
+  /// [ResponseConverter.fromRow] converts the [RowRequest] to [HttpRestRequest].
   /// eventually returns the result.
-  Future<ApexResponse> execute(ApexRequest request) async {
+  Future<HttpRestResponse> execute(HttpRestRequest request) async {
 
     RequestConverter requestConverter = _requestConverterForType(request.requestConverterType);
 
@@ -77,7 +77,7 @@ class ApexClient {
 
     rowResult = await _responseMiddleware.next(rowResult);
 
-    ApexResponse? response = responseConverter.fromRow(rowResult);
+    HttpRestResponse? response = responseConverter.fromRow(rowResult);
 
     return response;
   }
@@ -110,42 +110,42 @@ class ApexClient {
 }
 
 // Starting point
-class ApexClientBuilder {
-  ApexClientBuilder._(RequestExecutor requestExecutor) {
-    _client = ApexClient._(requestExecutor);
+class HttpRestClientBuilder {
+  HttpRestClientBuilder._(RequestExecutor requestExecutor) {
+    _client = HttpRestClient._(requestExecutor);
   }
 
-  late final ApexClient _client;
+  late final HttpRestClient _client;
 
-  /// Use this method to add request converters to [ApexClient]
-  ApexClientBuilder addRequestConverter(RequestConverter converter) {
+  /// Use this method to add request converters to [HttpRestClient]
+  HttpRestClientBuilder addRequestConverter(RequestConverter converter) {
     _client._requestConverters[converter.runtimeType] = converter;
     return this;
   }
 
-  /// Use this method to add response converters to [ApexClient]
-  ApexClientBuilder addResponseConverter(ResponseConverter converter) {
+  /// Use this method to add response converters to [HttpRestClient]
+  HttpRestClientBuilder addResponseConverter(ResponseConverter converter) {
     _client._responseConverters[converter.runtimeType] = converter;
     return this;
   }
 
-  /// Use this method to add request middlewares to [ApexClient]
-  ApexClientBuilder addRequestMiddleware(
+  /// Use this method to add request middlewares to [HttpRestClient]
+  HttpRestClientBuilder addRequestMiddleware(
       Middleware<RowRequest> middleware) {
     _client._requestMiddleware.addNext(middleware);
     return this;
   }
 
-  /// Use this method to add response middlewares to [ApexClient]
-  ApexClientBuilder addResponseMiddleware(
+  /// Use this method to add response middlewares to [HttpRestClient]
+  HttpRestClientBuilder addResponseMiddleware(
       Middleware<RowResponse> middleware) {
     _client._responseMiddleware.addNext(middleware);
     return this;
   }
 
-  /// Call this method at the end of the [ApexClient] configuration to get
-  /// the [ApexClient]'s instance.
-  ApexClient build() {
+  /// Call this method at the end of the [HttpRestClient] configuration to get
+  /// the [HttpRestClient]'s instance.
+  HttpRestClient build() {
     // add
     _client._responseMiddleware.addNext(Middleware());
     _client._requestMiddleware.addNext(Middleware());

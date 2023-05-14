@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:typed_data';
 
-import 'apex_io.dart';
-import 'apex_method.dart';
-import 'apex_middleware.dart';
+import 'http_rest_io.dart';
+import 'http_rest_method.dart';
+import 'http_rest_middleware.dart';
 
 
 /// This enum can be used to specify which part of the request need to logged

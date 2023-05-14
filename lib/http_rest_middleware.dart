@@ -25,8 +25,8 @@ class Middleware<R> {
   Middleware<R>? _next;
 
   /// This method adds a middleware to the chain.
-  /// This method is called by the Apex library, no need to call it manually,
-  /// instead use [ApexClientBuilder.addRequestMiddleware] and [ApexClientBuilder.addResponseMiddleware]
+  /// This method is called by the HttpRest library, no need to call it manually,
+  /// instead use [HttpRestClientBuilder.addRequestMiddleware] and [HttpRestClientBuilder.addResponseMiddleware]
   void addNext(Middleware<R> middleWare) {
     if (_next == null) {
       _next = middleWare;
@@ -36,7 +36,7 @@ class Middleware<R> {
   }
 
   /// This method will call next middleware in the chain. Initially this method get
-  /// called by the [ApexClient].
+  /// called by the [HttpRestClient].
   Future<R> next(R row) async {
     final next = _next;
     if (next == null) {

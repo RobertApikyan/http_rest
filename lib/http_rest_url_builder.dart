@@ -1,27 +1,27 @@
 
 
-class _ApexUrlBuilder {
+class _HttpRestUrlBuilder {
   late final String _base;
   late final String _url;
   final _entryStore = <UrlEntry>{};
   final _entryHandlerStore = <Type, UrlEntryHandler>{};
 
-  _ApexUrlBuilder base(String base) {
+  _HttpRestUrlBuilder base(String base) {
     _base = base;
     return this;
   }
 
-  _ApexUrlBuilder addUrlEntry(UrlEntry entry) {
+  _HttpRestUrlBuilder addUrlEntry(UrlEntry entry) {
     _entryStore.add(entry);
     return this;
   }
 
-  _ApexUrlBuilder addUrlEntryHandler(UrlEntryHandler handler) {
+  _HttpRestUrlBuilder addUrlEntryHandler(UrlEntryHandler handler) {
     _entryHandlerStore[handler.entryType] = handler;
     return this;
   }
 
-  _ApexUrlBuilder url(String url) {
+  _HttpRestUrlBuilder url(String url) {
     _url = url;
     return this;
   }
@@ -131,7 +131,7 @@ class QueryEntryHandler extends UrlEntryHandler<Query> {
 /// The value of requestUrl will be
 /// https://example.com/users/123/documents/456?type=education&name=calculus
 ///
-class UrlBuilder extends _ApexUrlBuilder {
+class UrlBuilder extends _HttpRestUrlBuilder {
   UrlBuilder.base(String base) {
     super.base(base);
     addUrlEntryHandler(QueryEntryHandler());
