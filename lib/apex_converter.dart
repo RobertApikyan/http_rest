@@ -4,51 +4,51 @@ import 'package:apex/apex_io.dart';
 
 /// This class is a base request converter definition, derive from this class
 /// and implement the [toRow] method, which responsibility is to convert the
-/// [RestRequest] to [RestRowResponse]. The library ships with pre defined
+/// [ApexRequest] to [RowResponse]. The library ships with pre defined
 /// request converters such as [MapToJsonRequestConverter], which converts the
-/// body [Map] provided by [RestRequest.body] to JSON [String].
-abstract class RestRequestConverter {
+/// body [Map] provided by [ApexRequest.body] to JSON [String].
+abstract class RequestConverter {
 
-  factory RestRequestConverter.empty() => _EmptyRequestConverter();
+  factory RequestConverter.empty() => _EmptyRequestConverter();
 
-  RestRequestConverter();
+  RequestConverter();
 
-  RestRowRequest toRow(RestRequest request);
+  RowRequest toRow(ApexRequest request);
 }
 
 /// This class is a base response converter definition, derive from this class
 /// and implement the [fromRow] method, which responsibility is to convert the
-/// [RestRowResponse] to [RestResponse]. The library ships with pre defined
+/// [RowResponse] to [ApexResponse]. The library ships with pre defined
 /// response converters such as [JsonToMapResponseConverter], which converts the
-/// received body bytes from [RestRowResponse.bodyBytes] to [Map] representation of
+/// received body bytes from [RowResponse.bodyBytes] to [Map] representation of
 /// JSON result.
-abstract class RestResponseConverter {
+abstract class ResponseConverter {
 
-  factory RestResponseConverter.empty() => _EmptyResponseConverter();
+  factory ResponseConverter.empty() => _EmptyResponseConverter();
 
-  RestResponseConverter();
+  ResponseConverter();
 
-  RestResponse fromRow(RestRowResponse rowResponse);
+  ApexResponse fromRow(RowResponse rowResponse);
 }
 
-class _EmptyRequestConverter extends RestRequestConverter {
+class _EmptyRequestConverter extends RequestConverter {
   @override
-  RestRowRequest toRow(RestRequest request) => RestRowRequest(request, request.body);
+  RowRequest toRow(ApexRequest request) => RowRequest(request, request.body);
 }
 
-class _EmptyResponseConverter extends RestResponseConverter {
+class _EmptyResponseConverter extends ResponseConverter {
   @override
-  RestResponse fromRow(RestRowResponse rowResponse) =>
-      RestResponse(rowResponse.request, rowResponse, rowResponse.bodyBytes);
+  ApexResponse fromRow(RowResponse rowResponse) =>
+      ApexResponse(rowResponse.request, rowResponse, rowResponse.bodyBytes);
 }
 
 /// [MapToJsonRequestConverter], which converts the
-/// body [Map] provided by [RestRequest.body] to JSON [String],
+/// body [Map] provided by [ApexRequest.body] to JSON [String],
 /// it uses the [JsonCodec] from dart.convert library to encode
-/// the provided [RestRequest.body] to JSON string.
-class MapToJsonRequestConverter extends RestRequestConverter {
+/// the provided [ApexRequest.body] to JSON string.
+class MapToJsonRequestConverter extends RequestConverter {
   @override
-  RestRowRequest toRow(RestRequest request) {
+  RowRequest toRow(ApexRequest request) {
     String? jsonBody;
     if (request.body != null) {
       if (request.body is Map) {
@@ -59,39 +59,39 @@ class MapToJsonRequestConverter extends RestRequestConverter {
     } else {
       jsonBody = '';
     }
-    return RestRowRequest(request, jsonBody);
+    return RowRequest(request, jsonBody);
   }
 }
 
 /// [JsonToMapResponseConverter] converts the
-/// received body bytes from [RestRowResponse.bodyBytes] to [Map] representation of
+/// received body bytes from [RowResponse.bodyBytes] to [Map] representation of
 /// JSON result.class, it uses the [JsonCodec] from dart.convert library to decode
 /// the json result.
-class JsonToMapResponseConverter extends RestResponseConverter {
+class JsonToMapResponseConverter extends ResponseConverter {
   @override
-  RestResponse fromRow(RestRowResponse rowResponse) {
+  ApexResponse fromRow(RowResponse rowResponse) {
     dynamic jsonMap;
     final rowBody = rowResponse.bodyBytes;
     if (rowBody != null && rowBody.isNotEmpty) {
       final rowBodyUtf8 = utf8.decode(rowBody);
       jsonMap = json.decode(rowBodyUtf8);
     }
-    return RestResponse(rowResponse.request, rowResponse, jsonMap);
+    return ApexResponse(rowResponse.request, rowResponse, jsonMap);
   }
 }
 
-/// This response converter converts the response [RestRowResponse.bodyBytes] to
+/// This response converter converts the response [RowResponse.bodyBytes] to
 /// utf8 encoded string.
-class StringResponseConverter extends RestResponseConverter {
+class StringResponseConverter extends ResponseConverter {
   @override
-  RestResponse fromRow(RestRowResponse rowResponse) {
+  ApexResponse fromRow(RowResponse rowResponse) {
     String? stringBody;
     final rowBody = rowResponse.bodyBytes;
     if (rowBody != null) {
       final rowBodyUtf8 = utf8.decode(rowBody);
       stringBody = rowBodyUtf8;
     }
-    return RestResponse(rowResponse.request, rowResponse, stringBody);
+    return ApexResponse(rowResponse.request, rowResponse, stringBody);
   }
 }
 

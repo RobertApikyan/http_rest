@@ -1,27 +1,27 @@
 
 
-class RestUrlBuilder {
+class _ApexUrlBuilder {
   late final String _base;
   late final String _url;
-  final _entryStore = <RestUrlEntry>{};
-  final _entryHandlerStore = <Type, RestUrlEntryHandler>{};
+  final _entryStore = <UrlEntry>{};
+  final _entryHandlerStore = <Type, UrlEntryHandler>{};
 
-  RestUrlBuilder base(String base) {
+  _ApexUrlBuilder base(String base) {
     _base = base;
     return this;
   }
 
-  RestUrlBuilder addUrlEntry(RestUrlEntry entry) {
+  _ApexUrlBuilder addUrlEntry(UrlEntry entry) {
     _entryStore.add(entry);
     return this;
   }
 
-  RestUrlBuilder addUrlEntryHandler(RestUrlEntryHandler handler) {
+  _ApexUrlBuilder addUrlEntryHandler(UrlEntryHandler handler) {
     _entryHandlerStore[handler.entryType] = handler;
     return this;
   }
 
-  RestUrlBuilder url(String url) {
+  _ApexUrlBuilder url(String url) {
     _url = url;
     return this;
   }
@@ -41,18 +41,18 @@ class RestUrlBuilder {
   }
 }
 
-abstract class RestUrlEntryHandler<E extends RestUrlEntry> {
+abstract class UrlEntryHandler<E extends UrlEntry> {
   Type get entryType;
 
   String onHandle(String url, E entry);
 }
 
-abstract class RestUrlEntry {
+abstract class UrlEntry {
   String get key;
 }
 
 /// PATH, QUERY
-abstract class CommonEntry extends RestUrlEntry {
+abstract class CommonEntry extends UrlEntry {
   CommonEntry(this.name, this.value);
 
   final String name;
@@ -74,7 +74,7 @@ class Query extends CommonEntry {
 }
 
 /// PATH, QUERY handlers
-class PathEntryHandler extends RestUrlEntryHandler<Path> {
+class PathEntryHandler extends UrlEntryHandler<Path> {
   @override
   Type get entryType => Path;
 
@@ -86,7 +86,7 @@ class PathEntryHandler extends RestUrlEntryHandler<Path> {
   }
 }
 
-class QueryEntryHandler extends RestUrlEntryHandler<Query> {
+class QueryEntryHandler extends UrlEntryHandler<Query> {
   @override
   Type get entryType => Query;
 
@@ -131,7 +131,7 @@ class QueryEntryHandler extends RestUrlEntryHandler<Query> {
 /// The value of requestUrl will be
 /// https://example.com/users/123/documents/456?type=education&name=calculus
 ///
-class UrlBuilder extends RestUrlBuilder {
+class UrlBuilder extends _ApexUrlBuilder {
   UrlBuilder.base(String base) {
     super.base(base);
     addUrlEntryHandler(QueryEntryHandler());
@@ -139,11 +139,11 @@ class UrlBuilder extends RestUrlBuilder {
   }
 
   @override
-  UrlBuilder addUrlEntry(RestUrlEntry entry) =>
+  UrlBuilder addUrlEntry(UrlEntry entry) =>
       super.addUrlEntry(entry) as UrlBuilder;
 
   @override
-  UrlBuilder addUrlEntryHandler(RestUrlEntryHandler<RestUrlEntry> handler) =>
+  UrlBuilder addUrlEntryHandler(UrlEntryHandler<UrlEntry> handler) =>
       super.addUrlEntryHandler(handler) as UrlBuilder;
 
   @override

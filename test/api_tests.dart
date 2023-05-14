@@ -1,12 +1,12 @@
 import 'package:apex/apex.dart';
-import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
 
   final client =
-      RestClient.builder(DefaultRestRequestExecutor(Client())).build();
+      ApexClient.builder(DefaultRequestExecutor(http.Client())).build();
 
-  client.execute(RestRequest(
-      method: RestMethods.post,
+  client.execute(ApexRequest(
+      method: Methods.post,
       url: '',));
 }

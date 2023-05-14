@@ -38,16 +38,16 @@ enum LogParts {
 ///
 ///  BODY:	{"firstName":"Joe"}
 ///  -------------------------------------------------------------------------------------------------------------------
-/// The [RequestLogger] is a descendant of [RestMiddleware], you can derive from
-/// the [RestMiddleware] and create you own request logger.
-class RequestLogger extends RestMiddleware<RestRowRequest> {
+/// The [RequestLogger] is a descendant of [Middleware], you can derive from
+/// the [Middleware] and create you own request logger.
+class RequestLogger extends Middleware<RowRequest> {
   RequestLogger({this.logParts = LogParts.all});
 
   final Set<LogParts> logParts;
 
   @override
-  Future<RestRowRequest> onNext(
-      RestRowRequest row, RestMiddleware<RestRowRequest> nextMiddleware) async {
+  Future<RowRequest> onNext(
+      RowRequest row, Middleware<RowRequest> nextMiddleware) async {
     final request = row.request;
     final rowBody = row.rowBody;
 
@@ -99,16 +99,16 @@ class RequestLogger extends RestMiddleware<RestRowRequest> {
 ///
 ///  BODY:  {"message":"Success"}
 ///  -------------------------------------------------------------------------------------------------------------------
-/// The [ResponseLogger] is a descendant of [RestMiddleware], you can derive from
-/// the [RestMiddleware] and create you own response logger.
-class ResponseLogger extends RestMiddleware<RestRowResponse> {
+/// The [ResponseLogger] is a descendant of [Middleware], you can derive from
+/// the [Middleware] and create you own response logger.
+class ResponseLogger extends Middleware<RowResponse> {
   ResponseLogger({this.logParts = LogParts.all});
 
   final Set<LogParts> logParts;
 
   @override
-  Future<RestRowResponse> onNext(RestRowResponse row,
-      RestMiddleware<RestRowResponse> nextMiddleware) async {
+  Future<RowResponse> onNext(RowResponse row,
+      Middleware<RowResponse> nextMiddleware) async {
     log('');
     logDivider();
 
@@ -146,7 +146,7 @@ class ResponseLogger extends RestMiddleware<RestRowResponse> {
   }
 }
 
-void _logUrl(RestMethods method, String url) {
+void _logUrl(Methods method, String url) {
   String endpoint = '${method.name.toString().toUpperCase()}: $url';
   tabbedLog(endpoint);
 }

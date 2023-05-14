@@ -1,5 +1,5 @@
 /// Represents the rest methods
-enum RestMethods {
+enum Methods {
   get,
   post,
   put,

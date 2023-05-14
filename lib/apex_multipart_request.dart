@@ -5,10 +5,10 @@ typedef HttpMultipartRequestProgressListener = void Function(
     int bytes, int totalBytes);
 
 /// This class is used to make a multipart request. The instance of this class
-/// need to be passed to [RestRequest.body].
+/// need to be passed to [ApexRequest.body].
 /// This class also provides [progressListener] which can be used to track the progress.
-class MultipartRestRequestBody {
-  const MultipartRestRequestBody({
+class MultipartRequestBody {
+  const MultipartRequestBody({
     required this.fields,
     required this.files,
     this.progressListener,

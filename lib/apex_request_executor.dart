@@ -2,43 +2,43 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:apex/apex.dart';
 import 'package:http/http.dart';
 
 import 'apex_io.dart';
 import 'apex_method.dart';
 import 'apex_multipart_request.dart';
 
-
 /// This abstract class is the main handler for http calls.
 /// Derive from this class and implement the [execute] method, which receives
-/// the [RestRowRequest] as an argument and returns [RestRowResponse] as a result.
+/// the [RowRequest] as an argument and returns [RowResponse] as a result.
 /// The actual http call should happen in the [execute] method's body.
-/// To create a [RestClient] instance, first and foremost you will need to provide an implementation of
-/// [RestRequestExecutor] to [RestClient.builder] as shown in the example below.
+/// To create a [ApexClient] instance, first and foremost you will need to provide an implementation of
+/// [RequestExecutor] to [ApexClient.builder] as shown in the example below.
 /// ```dart
-/// final RestClient client =
-///       RestClient.builder(DefaultRestRequestExecutor(Client()))
+/// final ApexClient client =
+///       ApexClient.builder(DefaultRequestExecutor(Client()))
 ///           .addRequestConverter(MapToJsonRequestConverter())
 ///           .addResponseConverter(JsonToMapResponseConverter())
 ///           .addResponseMiddleware(ResponseLogger())
 ///           .addRequestMiddleware(RequestLogger())
 ///           .build();
 /// ```
-abstract class RestRequestExecutor {
+abstract class RequestExecutor {
   /// Override this method and implement http call by using the parameters from
   /// the [rowRequest].
-  Future<RestRowResponse> execute(RestRowRequest rowRequest);
+  Future<RowResponse> execute(RowRequest rowRequest);
 }
 
-/// This class is a default implementation of the [RestRequestExecutor], and uses
+/// This class is a default implementation of the [RequestExecutor], and uses
 /// [Client] from the "http" library (link:https://pub.dev/packages/http) for request execution.
-/// [DefaultRestRequestExecutor] supports regular Rest method requests and as well as multipart
-/// requests, see [MultipartRestRequestBody] for multipart request example.
-class DefaultRestRequestExecutor extends RestRequestExecutor {
+/// [DefaultRequestExecutor] supports regular Rest method requests and as well as multipart
+/// requests, see [MultipartRequestBody] for multipart request example.
+class DefaultRequestExecutor extends RequestExecutor {
   /// Any [Client] implementation from the "http" library (link:https://pub.dev/packages/http).
   /// [timeOutDuration] configures the request's result wait duration, if request will
   /// rich the [timeOutDuration] the [SocketException] will be thrown.
-  DefaultRestRequestExecutor(this.client,
+  DefaultRequestExecutor(this.client,
       {this.timeOutDuration = const Duration(minutes: 5)});
 
   final Client client;
@@ -53,14 +53,14 @@ class DefaultRestRequestExecutor extends RestRequestExecutor {
       response.timeout(timeOutDuration, onTimeout: _onTimeOut);
 
   @override
-  Future<RestRowResponse> execute(RestRowRequest rowRequest) async {
+  Future<RowResponse> execute(RowRequest rowRequest) async {
     Response? response;
     Uri uri = Uri.parse(rowRequest.request.url);
 
     final request = rowRequest.request;
 
-    if (request.body is MultipartRestRequestBody) {
-      final multipartRequestBody = request.body as MultipartRestRequestBody;
+    if (request.body is MultipartRequestBody) {
+      final multipartRequestBody = request.body as MultipartRequestBody;
 
       final multipartRequest = _ProgressedMultipartRequest(
           request.method.name, uri,
@@ -77,32 +77,32 @@ class DefaultRestRequestExecutor extends RestRequestExecutor {
           .then((streamResponse) => Response.fromStream(streamResponse)));
     } else {
       switch (request.method) {
-        case RestMethods.get:
+        case Methods.get:
           response = await _withTimeOut(
               client.get(uri, headers: rowRequest.request.headers));
           break;
-        case RestMethods.head:
+        case Methods.head:
           response = await _withTimeOut(
               client.head(uri, headers: rowRequest.request.headers));
           break;
-        case RestMethods.post:
+        case Methods.post:
           response = await _withTimeOut(client.post(uri,
               headers: rowRequest.request.headers,
               body: rowRequest.rowBody,
               encoding: request.encoding));
           break;
-        case RestMethods.put:
+        case Methods.put:
           response = await _withTimeOut(client.put(uri,
               headers: rowRequest.request.headers,
               body: rowRequest.rowBody,
               encoding: request.encoding));
           break;
-        case RestMethods.delete:
+        case Methods.delete:
           response = await _withTimeOut(client._deleteWithBody(uri,
               headers: rowRequest.request.headers,
               body: (rowRequest.request.body ?? "") as String));
           break;
-        case RestMethods.patch:
+        case Methods.patch:
           response = await _withTimeOut(client.patch(uri,
               headers: rowRequest.request.headers,
               body: rowRequest.rowBody,
@@ -111,15 +111,14 @@ class DefaultRestRequestExecutor extends RestRequestExecutor {
       }
     }
 
-    RestRowResponse rowResponse =
-        _fromHttpResponse(response, rowRequest.request);
+    RowResponse rowResponse = _fromHttpResponse(response, rowRequest.request);
 
     return rowResponse;
   }
 
-  RestRowResponse _fromHttpResponse(Response? response, RestRequest request) {
+  RowResponse _fromHttpResponse(Response? response, ApexRequest request) {
     if (response != null) {
-      return RestRowResponse(
+      return RowResponse(
           request,
           response.statusCode,
           response.bodyBytes,
@@ -129,7 +128,7 @@ class DefaultRestRequestExecutor extends RestRequestExecutor {
           response.persistentConnection,
           response.reasonPhrase);
     } else {
-      return RestRowResponse.undefined(request);
+      return RowResponse.undefined(request);
     }
   }
 }
