@@ -1,295 +1,227 @@
-# Boilerplate Project
+# HTTP REST
 
-A boilerplate project created in flutter using MobX and Provider. Boilerplate supports both web and mobile, clone the appropriate branches mentioned below:
+HTTP REST provides all the necessary tools to simplify and streamline your HTTP interactions. It is a lightweight and vercetile networking library based on the popular Flutter's [http](https://pub.dev/packages/http) library and serves as an enhancement, providing additional features and functionalities such as 
 
-* For Mobile: https://github.com/zubairehman/flutter-boilerplate-project/tree/master (stable channel)
-* For Web: https://github.com/zubairehman/flutter-boilerplate-project/tree/feature/web-support (beta channel)
+* Middlewares (Interceptors)
+* Request and response body converters
+* Multipart requests with progress
+* Request/Response logger
 
 ## Getting Started
 
-The Boilerplate contains the minimal implementation required to create a new library or project. The repository code is preloaded with some basic components like basic app architecture, app theme, constants and required dependencies to create a new project. By using boiler plate code as standard initializer, we can have same patterns in all the projects that will inherit it. This will also help in reducing setup & development time by allowing you to use same code pattern and avoid re-writing from scratch.
-
-## How to Use
-
-**Step 1:**
-
-Download or clone this repo by using the link below:
-
-```
-https://github.com/zubairehman/flutter-boilerplate-project.git
-```
-
-**Step 2:**
-
-Go to project root and execute the following command in console to get the required dependencies:
-
-```
-flutter pub get 
-```
-
-**Step 3:**
-
-This project uses `inject` library that works with code generation, execute the following command to generate files:
-
-```
-flutter packages pub run build_runner build --delete-conflicting-outputs
-```
-
-or watch command in order to keep the source code synced automatically:
-
-```
-flutter packages pub run build_runner watch
-```
-
-## Hide Generated Files
-
-In-order to hide generated files, navigate to `Android Studio` -> `Preferences` -> `Editor` -> `File Types` and paste the below lines under `ignore files and folders` section:
-
-```
-*.inject.summary;*.inject.dart;*.g.dart;
-```
-
-In Visual Studio Code, navigate to `Preferences` -> `Settings` and search for `Files:Exclude`. Add the following patterns:
-```
-**/*.inject.summary
-**/*.inject.dart
-**/*.g.dart
-```
-
-## Boilerplate Features:
-
-* Splash
-* Login
-* Home
-* Routing
-* Theme
-* Dio
-* Database
-* MobX (to connect the reactive data of your application with the UI)
-* Provider (State Management)
-* Encryption
-* Validation
-* Code Generation
-* User Notifications
-* Logging
-* Dependency Injection
-* Dark Theme Support (new)
-* Multilingual Support (new)
-* Provider example (new)
-
-### Up-Coming Features:
-
-* Connectivity Support
-* Background Fetch Support
-
-### Libraries & Tools Used
-
-* [Dio](https://github.com/flutterchina/dio)
-* [Database](https://github.com/tekartik/sembast.dart)
-* [MobX](https://github.com/mobxjs/mobx.dart) (to connect the reactive data of your application with the UI)
-* [Provider](https://github.com/rrousselGit/provider) (State Management)
-* [Encryption](https://github.com/xxtea/xxtea-dart)
-* [Validation](https://github.com/dart-league/validators)
-* [Logging](https://github.com/zubairehman/Flogs)
-* [Notifications](https://github.com/AndreHaueisen/flushbar)
-* [Json Serialization](https://github.com/dart-lang/json_serializable)
-* [Dependency Injection](https://github.com/fluttercommunity/get_it)
-
-### Folder Structure
-Here is the core folder structure which flutter provides.
-
-```
-flutter-app/
-|- android
-|- build
-|- ios
-|- lib
-|- test
-```
-
-Here is the folder structure we have been using in this project
-
-```
-lib/
-|- constants/
-|- data/
-|- stores/
-|- ui/
-|- utils/
-|- widgets/
-|- main.dart
-|- routes.dart
-```
-
-Now, lets dive into the lib folder which has the main code for the application.
-
-```
-1- constants - All the application level constants are defined in this directory with-in their respective files. This directory contains the constants for `theme`, `dimentions`, `api endpoints`, `preferences` and `strings`.
-2- data - Contains the data layer of your project, includes directories for local, network and shared pref/cache.
-3- stores - Contains store(s) for state-management of your application, to connect the reactive data of your application with the UI. 
-4- ui — Contains all the ui of your project, contains sub directory for each screen.
-5- util — Contains the utilities/common functions of your application.
-6- widgets — Contains the common widgets for your applications. For example, Button, TextField etc.
-7- routes.dart — This file contains all the routes for your application.
-8- main.dart - This is the starting point of the application. All the application level configurations are defined in this file i.e, theme, routes, title, orientation etc.
-```
-
-### Constants
-
-This directory contains all the application level constants. A separate file is created for each type as shown in example below:
-
-```
-constants/
-|- app_theme.dart
-|- dimens.dart
-|- endpoints.dart
-|- preferences.dart
-|- strings.dart
-```
-
-### Data
-
-All the business logic of your application will go into this directory, it represents the data layer of your application. It is sub-divided into three directories `local`, `network` and `sharedperf`, each containing the domain specific logic. Since each layer exists independently, that makes it easier to unit test. The communication between UI and data layer is handled by using central repository.
-
-```
-data/
-|- local/
-    |- constants/
-    |- datasources/
-    |- app_database.dart
-   
-|- network/
-    |- constants/
-    |- exceptions/
-    |- rest_client.dart
-    
-|- sharedpref
-    |- constants/
-    |- shared_preference_helper.dart
-    
-|- repository.dart
-
-```
-
-### Stores
-
-The store is where all your application state lives in flutter. The Store is basically a widget that stands at the top of the widget tree and passes it's data down using special methods. In-case of multiple stores, a separate folder for each store is created as shown in the example below:
-
-```
-stores/
-|- login/
-    |- login_store.dart
-    |- form_validator.dart
-```
-
-### UI
-
-This directory contains all the ui of your application. Each screen is located in a separate folder making it easy to combine group of files related to that particular screen. All the screen specific widgets will be placed in `widgets` directory as shown in the example below:
-
-```
-ui/
-|- login
-   |- login_screen.dart
-   |- widgets
-      |- login_form.dart
-      |- login_button.dart
-```
-
-### Utils
-
-Contains the common file(s) and utilities used in a project. The folder structure is as follows:
-
-```
-utils/
-|- encryption
-   |- xxtea.dart
-|- date
-  |- date_time.dart
-```
-
-### Widgets
-
-Contains the common widgets that are shared across multiple screens. For example, Button, TextField etc.
-
-```
-widgets/
-|- app_icon_widget.dart
-|- empty_app_bar.dart
-|- progress_indicator.dart
-```
-
-### Routes
-
-This file contains all the routes for your application.
+Create the instance of `HttpRestClient`, then run the `HttpRestReqeust`.
 
 ```dart
-import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:http_rest/http_rest.dart';
+...
+  final httpClient =
+  HttpRestClient.builder(DefaultRequestExecutor(http.Client()))
+      .addResponseConverter(JsonToMapResponseConverter()) // Request converter
+      .addRequestConverter(MapToJsonRequestConverter()) // Response converter
+      .addRequestMiddleware(RequestLogger()) // Request Middleware
+      .addResponseMiddleware(ResponseLogger()) // Response Middleware
+      .build();
 
-import 'ui/home/home.dart';
-import 'ui/login/login.dart';
-import 'ui/splash/splash.dart';
+  // This request will add a book to library 
+  final result = await httpClient.execute(HttpRestRequest(
+      method: Methods.post,
+      // Specifies request converter type
+      requestConverterType: MapToJsonRequestConverter,
+      // Specifies response converter type
+      responseConverterType: JsonToMapResponseConverter,
+      url: 'https://example.com/books',
+      headers: {'Language': 'en'},
+      body: {
+        "id":2,
+        "bookName":"1984",
+        "author":"George Orwell"
+      }));
 
-class Routes {
-  Routes._();
-
-  //static variables
-  static const String splash = '/splash';
-  static const String login = '/login';
-  static const String home = '/home';
-
-  static final routes = <String, WidgetBuilder>{
-    splash: (BuildContext context) => SplashScreen(),
-    login: (BuildContext context) => LoginScreen(),
-    home: (BuildContext context) => HomeScreen(),
-  };
-}
+  if(result.rowResponse.code == 201){
+    print(result.response); // instance of Map
+  }
+...
 ```
-
-### Main
-
-This is the starting point of the application. All the application level configurations are defined in this file i.e, theme, routes, title, orientation etc.
+The same `httpClient` instance can be used to run other http requests as well.
 
 ```dart
-import 'package:boilerplate/routes.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+// The request will get the library books.
+final result = await httpClient.execute(HttpRestRequest(
+      method: Methods.get,
+      responseConverterType: JsonToMapResponseConverter,
+      url: 'https://example.com/books?count='$10''))
+```
 
-import 'constants/app_theme.dart';
-import 'constants/strings.dart';
-import 'ui/splash/splash.dart';
+## HttpRestClient
 
-void main() {
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-    DeviceOrientation.landscapeRight,
-    DeviceOrientation.landscapeLeft,
-  ]).then((_) {
-    runApp(MyApp());
-  });
-}
+The `HttpRestClient ` class acts as the central hub, coordinating the flow of requests and responses, and allowing for extensibility and customization at various stages through request and response converters, middlewares, and the RequestExecutor class.
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+When a request is made through the HttpRestClient, the following steps occur:
+
+1. **Request Conversion**: The request object is passed through the request converter, which transforms it into the appropriate format for sending over the network. This ensures compatibility with the API endpoint and handles any necessary data conversions.
+
+2. **Request Middlewares**: The converted request then goes through a chain of request middlewares. These middlewares allow you to inject custom logic before the request is sent. Examples of request middleware functionalities include authentication, adding headers, or modifying the request payload.
+
+3. **Request Execution**: The processed request is passed to the RequestExecutor class, which handles the actual execution of the HTTP request. The RequestExecutor interacts with the network layer, communicates with the API endpoint, and receives the raw response.
+
+4. **Response Middlewares**: The response received from the RequestExecutor is then passed through a chain of response middlewares. These middlewares enable you to manipulate and process the response before it is returned to the caller. Common use cases for response middlewares include parsing response data, error handling, or logging.
+
+5. **Response Conversion**: After going through the response middlewares, the response is passed to the response converter. The response converter transforms the raw response into a structured format that aligns with your application's needs. This conversion step ensures that the response is in a format that can be easily consumed and understood by your code.
+
+6. **Result Return**: Finally, the converted response is returned as the result of the original request made through the HttpRestClient. The caller receives the processed response, which can be further processed or used to update the application's state.
+
+
+## Middlewares
+
+HttpRestClient uses middleware chains to modify requests and responses.
+
+Here is how to create a request middleware that adds authorization header to each HttpRestRequest.
+
+```dart
+class AuthorizationMiddleware extends Middleware<RowRequest> {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: Strings.appName,
-      theme: themeData,
-      routes: Routes.routes,
-      home: SplashScreen(),
-    );
+  Future<RowRequest> onNext(
+      RowRequest row, Middleware<RowRequest> nextMiddleware) async {
+    row.request.headers['Authorization'] = 'YOUR AUTHORIZATION TOKEN';
+    return await super.onNext(row, nextMiddleware);
+  }
+}
+```
+And add it while building the instance of `HttpRestClient` as shown below
+
+```dart
+  final httpClient = HttpRestClient.builder(
+          DefaultRequestExecutor(http.Client()))
+      .addResponseConverter(JsonToMapResponseConverter())
+      .addRequestConverter(MapToJsonRequestConverter()) 
+      .addRequestMiddleware(AuthorizationMiddleware()) // Added
+      .addRequestMiddleware(RequestLogger()) 
+      .addResponseMiddleware(ResponseLogger())
+      .build();
+```
+Hence every request that has been executed by the `httpClient` 'Authorization' header will be added. Note that `RequestLogger` and `ResponseLogger` are also middlewares.
+
+Any number of request and response Middlewares can be added to `HttpRestClient`, and they will be called in the same order as has been added.
+
+## Converters
+
+Converters are used to convert reqeust and response bodies. Library sheeps with a few default converters 
+
+`MapToJsonRequestConverter` used to convert request's map body to JSON string.
+`JsonToMapResponseConverter` used to convert response body bytes to map object.
+`StringResponseConverter` used to convert response body bytes to String.
+
+Each `HttpRestRequest` can specify the request and response converter type, and `HttpRestClient` will use specified converters to convert the request and responce bodies.
+
+```dart
+// The request will get the library books.
+final result = await httpClient.execute(HttpRestRequest(
+      method: Methods.get,
+      // Converts Request body to JSON
+      responseConverterType: JsonToMapResponseConverter,
+      url: 'https://example.com/books?count='$10''))
+```
+
+Here is how to create a converter that converts received bodyBytes to map object.
+
+```dart
+import 'dart:convert';
+
+class JsonToMapResponseConverter extends ResponseConverter {
+  @override
+  HttpRestResponse fromRow(RowResponse rowResponse) {
+    dynamic jsonMap;
+    final rowBody = rowResponse.bodyBytes;
+    if (rowBody != null && rowBody.isNotEmpty) {
+      final rowBodyUtf8 = utf8.decode(rowBody);
+      jsonMap = json.decode(rowBodyUtf8);
+    }
+    return HttpRestResponse(rowResponse.request, rowResponse, jsonMap);
   }
 }
 ```
 
-## Wiki
+Notice that `fromRow` method receives instance of `RowResponse` and returns instance of `HttpRestResponse`. 
+* `RowResponse` is lower level of response model, it contains `bodyBytes` of response and more, like response code and headers. 
+* `HttpRestResponse` is what `await client.execute(HttpRestRequest(...))` returns, it contains instance of original `HttpRestRequest`, `RowResponse` and converted body `jsonMap`.
 
-Checkout [wiki](https://github.com/zubairehman/flutter-boilerplate-project/wiki) for more info
 
-## Conclusion
 
-I will be happy to answer any questions that you may have on this approach, and if you want to lend a hand with the boilerplate then please feel free to submit an issue and/or pull request 🙂
+## Logger
 
-Again to note, this is example can appear as over-architectured for what it is - but it is an example only. If you liked my work, don’t forget to ⭐ star the repo to show your support.
+`RequestLogger` and `ResponseLogger` are used to log the network interactions to console.
+
+Here is how logged request looks like in the console.
+
+```
+→ REQUEST →
+POST: https://example.com/books
+HEADERS:    Content-Type : application/json
+            Authorization : eyJhbGciOi....
+            Language : EN
+            Version : 1.1.76
+BODY:	{"id":2, "bookName":"1984", "author":"George Orwell"}
+
+← RESPONSE ←
+POST: https://example.com/books
+CODE: 200
+HEADERS:    connection : keep-alive
+            date : Thu, 04 May 2023 19:02:10 GMT
+            transfer-encoding : chunked
+            vary : accept-encoding
+            content-encoding : gzip
+            strict-transport-security : max-age=15724800; includeSubDomains
+            content-type : application/json
+
+BODY:  {"message":"Success"}
+```
+
+Control loaggable parts with `LogParts` enum
+
+```dart
+enum LogParts {
+  headers,
+  body,
+  url,
+  code;
+
+  static const all = {url, headers, code, body}; // default
+}
+```
+
+By default all the parts of request and response are logged. Here is how to spcify Loggers to log only url and headers.
+
+```dart
+  final httpClient = HttpRestClient.builder(
+      DefaultRequestExecutor(http.Client()))
+...
+      .addRequestMiddleware(RequestLogger(logParts: {LogParts.url,LogParts.headers})) // Middlewares
+      .addResponseMiddleware(ResponseLogger(logParts: {LogParts.url,LogParts.headers}))
+      .build();
+```
+
+## Multipart Request
+
+Multipart request is done similar to regular request, just provide a `MultipartRequestBody` to `HttpRestRequest`'s body.
+
+Here is how to create a multipart request to upload a book and watch the progress.
+
+```dart
+void uploadBook(MultipartFile multipartFile) =>
+    httpClient.execute(HttpRestRequest(
+      method: Methods.post,
+      url: 'https://example.come/book',
+      body: MultipartRequestBody(
+        fields: {},
+        files: [multipartFile],
+        progressListener: (bytes, totalBytes) {
+          // watch the progress
+        },
+      ),
+    ));
+``` 
+
+## Conclusion 
+
+Please fill free to ask a question or open an issue in the github I will be happy to answer.

@@ -5,8 +5,43 @@ import 'package:http_rest/http_rest_io.dart';
 import 'package:http_rest/http_rest_middleware.dart';
 import 'package:http_rest/http_rest_request_executor.dart';
 
-/// This is the main class which wires converters, middlewares and request
-/// executors together. To create an instance of [HttpRestClient] use the [HttpRestClient.builder] method
+/// The `HttpRestClient ` class acts as the central hub, coordinating the flow of
+/// requests and responses, and allowing for extensibility and customization at
+/// various stages through request and response converters, middlewares, and the
+/// RequestExecutor class.
+///
+/// When a request is made through the HttpRestClient, the following steps occur:
+///
+/// Request Conversion: The request object is passed through the request converter,
+/// which transforms it into the appropriate format for sending over the network.
+/// This ensures compatibility with the API endpoint and handles any necessary data conversions.
+///
+/// Request Middlewares: The converted request then goes through a chain of request middlewares.
+/// These middlewares allow you to inject custom logic before the request is sent.
+/// Examples of request middleware functionalities include authentication, adding headers,
+/// or modifying the request payload.
+///
+/// Request Execution: The processed request is passed to the RequestExecutor class,
+/// which handles the actual execution of the HTTP request. The RequestExecutor interacts with the network layer,
+/// communicates with the API endpoint, and receives the raw response.
+///
+/// Response Middlewares: The response received from the RequestExecutor is then
+/// passed through a chain of response middlewares. These middlewares enable you to
+/// manipulate and process the response before it is returned to the caller.
+/// Common use cases for response middlewares include parsing response data,
+/// error handling, or logging.
+///
+/// Response Conversion: After going through the response middlewares, the response
+/// is passed to the response converter. The response converter transforms the raw
+/// response into a structured format that aligns with your application's needs.
+/// This conversion step ensures that the response is in a format that can be easily
+/// consumed and understood by your code.
+///
+/// Result Return: Finally, the converted response is returned as the result of the
+/// original request made through the HttpRestClient. The caller receives the processed
+/// response, which can be further processed or used to update the application's state.
+///
+/// To create an instance of [HttpRestClient] use the [HttpRestClient.builder] method
 /// and provide a [RequestExecutor]'s implementation, the "HttpRest" library ships with a
 /// default implementation [DefaultRequestExecutor], you can use it or create your own
 /// implementation of [RequestExecutor].
@@ -28,6 +63,8 @@ import 'package:http_rest/http_rest_request_executor.dart';
 /// for more check the [HttpRest_converter].
 /// There are default logging middlewares for requests and responses which ships with
 /// the library, see [RequestLogger] and [ResponseLogger].
+///
+///
 class HttpRestClient {
   HttpRestClient._(this._requestExecutor);
 

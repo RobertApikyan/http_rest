@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:http_rest/http_rest_io.dart';
 
 /// This class is a base request converter definition, derive from this class
