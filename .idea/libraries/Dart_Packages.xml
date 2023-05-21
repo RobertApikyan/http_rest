@@ -200,13 +200,6 @@
             </list>
           </value>
         </entry>
-        <entry key="flutter">
-          <value>
-            <list>
-              <option value="$USER_HOME$/fvm/versions/3.10.0/packages/flutter/lib" />
-            </list>
-          </value>
-        </entry>
         <entry key="flutter_lints">
           <value>
             <list>
@@ -218,13 +211,6 @@
           <value>
             <list>
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/flutter_template_images-4.2.0/lib" />
-            </list>
-          </value>
-        </entry>
-        <entry key="flutter_test">
-          <value>
-            <list>
-              <option value="$USER_HOME$/fvm/versions/3.10.0/packages/flutter_test/lib" />
             </list>
           </value>
         </entry>
@@ -470,13 +456,6 @@
           <value>
             <list>
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/shelf_web_socket-1.0.3/lib" />
-            </list>
-          </value>
-        </entry>
-        <entry key="sky_engine">
-          <value>
-            <list>
-              <option value="$USER_HOME$/fvm/versions/3.10.0/bin/cache/pkg/sky_engine/lib" />
             </list>
           </value>
         </entry>
@@ -758,9 +737,6 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/webkit_inspection_protocol-1.2.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/xml-6.2.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/yaml-3.1.1/lib" />
-      <root url="file://$USER_HOME$/fvm/versions/3.10.0/bin/cache/pkg/sky_engine/lib" />
-      <root url="file://$USER_HOME$/fvm/versions/3.10.0/packages/flutter/lib" />
-      <root url="file://$USER_HOME$/fvm/versions/3.10.0/packages/flutter_test/lib" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

@@ -3,7 +3,7 @@
 HTTP REST provides all the necessary tools to simplify and streamline your HTTP interactions. It is a lightweight and vercetile networking library based on the popular Flutter's [http](https://pub.dev/packages/http) library and serves as an enhancement, providing additional features and functionalities such as 
 
 * Middlewares (Interceptors)
-* Request and response body converters
+* Request/Response body converters
 * Multipart requests with progress
 * Request/Response logger
 
@@ -71,7 +71,6 @@ When a request is made through the HttpRestClient, the following steps occur:
 
 6. **Result Return**: Finally, the converted response is returned as the result of the original request made through the HttpRestClient. The caller receives the processed response, which can be further processed or used to update the application's state.
 
-
 ## Middlewares
 
 HttpRestClient uses middleware chains to modify requests and responses.
@@ -100,13 +99,14 @@ And add it while building the instance of `HttpRestClient` as shown below
       .addResponseMiddleware(ResponseLogger())
       .build();
 ```
-Hence every request that has been executed by the `httpClient` 'Authorization' header will be added. Note that `RequestLogger` and `ResponseLogger` are also middlewares.
+Hence the 'Authorization' header will be added to every request that has been executed by the `httpClient`. 
+Note that `RequestLogger` and `ResponseLogger` are also middlewares.
 
-Any number of request and response Middlewares can be added to `HttpRestClient`, and they will be called in the same order as has been added.
+Any number of request and response Middlewares can be added to `HttpRestClient`, and they will be called as a chain in the same order as has been added.
 
 ## Converters
 
-Converters are used to convert reqeust and response bodies. Library sheeps with a few default converters 
+Converters are used to convert request and response bodies. Library sheep with a few default converters 
 
 `MapToJsonRequestConverter` used to convert request's map body to JSON string.
 `JsonToMapResponseConverter` used to convert response body bytes to map object.
@@ -217,11 +217,26 @@ void uploadBook(MultipartFile multipartFile) =>
         files: [multipartFile],
         progressListener: (bytes, totalBytes) {
           // watch the progress
+		  final progress = bytes / totalBytes
         },
       ),
     ));
 ``` 
+## Request Executor
 
+The `RequestExecutor` is responible for running actual http requests and return the result. It's an abstract class, with a single abstract method `execute`
+```
+abstract class RequestExecutor {
+  /// Override this method and implement http call by using the parameters from
+  /// the [rowRequest].
+  Future<RowResponse> execute(RowRequest rowRequest);
+}
+```
+
+`DefaultRequestExecutor` is a default implementation of `RequestExecutor` and uses [http](https://pub.dev/packages/http) library for network interactions. 
+ 
 ## Conclusion 
+
+In summary, the HTTP REST Library simplifies and enhances RESTful API integration. With support for RESTful methods, middlewares, converters, and multipart requests, it streamlines HTTP interactions. It provides customization options, abstraction, error handling, and enhanced logging, making it a valuable tool for building robust applications.
 
 Please fill free to ask a question or open an issue in the github I will be happy to answer.

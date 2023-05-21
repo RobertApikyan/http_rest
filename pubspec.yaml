@@ -1,6 +1,6 @@
 name: http_rest
 description: Flutter networking client
-version: 0.0.4-dev.3
+version: 0.0.4-dev.4
 homepage:
 
 environment:
@@ -8,8 +8,6 @@ environment:
   flutter: ">=1.17.0"
 
 dependencies:
-  flutter:
-    sdk: flutter
   http: ^0.13.5
 
 dev_dependencies:
