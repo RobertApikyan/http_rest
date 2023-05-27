@@ -1,3 +1,4 @@
+![](https://raw.githubusercontent.com/RobertApikyan/http_rest/main/doc/assets/intro.png)
 # HTTP REST
 
 HTTP REST provides all the necessary tools to simplify and streamline your HTTP interactions. It is a lightweight and vercetile networking library based on the popular Flutter's [http](https://pub.dev/packages/http) library and serves as an enhancement, providing additional features and functionalities such as 
