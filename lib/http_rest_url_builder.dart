@@ -41,17 +41,30 @@ class _HttpRestUrlBuilder {
   }
 }
 
+/// The base class which finds the url entries in the given url by the UrlEntry.key
+/// and makes the appropriate modifications to the url, by returning the modified
+/// URL as a result of [onHandle] method.
 abstract class UrlEntryHandler<E extends UrlEntry> {
+  /// The type of the [UrlEntry] that this [UrlEntryHandler] is responsible for.
   Type get entryType;
 
+  /// Override this method and implement the handling of the url, see the examples
+  /// in the [QueryEntryHandler] and [PathEntryHandler].
   String onHandle(String url, E entry);
 }
 
+/// The base class which used by [UrlEntryHandler] to identify the entries in
+/// the url by the provided [key].
 abstract class UrlEntry {
+  /// This [key] is used by the [UrlEntryHandler] to identify the entry in the given URL.
   String get key;
 }
 
-/// PATH, QUERY
+/// The base implementation of [UrlEntry] class that represents the basic element of the URL,
+/// with the entry [name] and [value] .
+/// The entry could be a query (https://example.com?id=1) or a single part of the
+/// url (https://example.com/{userId}/profile). The prime examples of
+/// [CommonEntry] implementation are [Query] and [Path] classes.
 abstract class CommonEntry extends UrlEntry {
   CommonEntry(this.name, this.value);
 
@@ -59,6 +72,10 @@ abstract class CommonEntry extends UrlEntry {
   final String value;
 }
 
+/// The implementation of [CommonEntry] which handles the "path" in the URL.
+/// For a given url https://example.com/{userId}/profile the {userId} is a path entry,
+/// with the [name] parameter equal to "userId" and eventually the [name]={userId} will be replaced
+/// with the [value]=15 by the [PathEntryHandler], so we will end up with https://example.com/15/profile.
 class Path extends CommonEntry {
   Path(String name, String value) : super(name, value);
 
@@ -66,6 +83,9 @@ class Path extends CommonEntry {
   String get key => '{$name}';
 }
 
+/// The implementation of [CommonEntry] which handles the "query" in the URL.
+/// The [QueryEntryHandler] will add given [Query] entries the the end of the URL in a
+/// given order.
 class Query extends CommonEntry {
   Query(String name, String value) : super(name, value);
 
@@ -73,7 +93,11 @@ class Query extends CommonEntry {
   String get key => name;
 }
 
-/// PATH, QUERY handlers
+/// The [UrlEntryHandler] which will replace all the URL paths with the given structure {<path_name>}
+/// with the appropriate values.
+/// For a given url https://example.com/{userId}/profile the {userId} is a path entry,
+/// with the [name] parameter equal to "userId" and eventually the [name]={userId} will be replaced
+/// with the [value]=15 by the [PathEntryHandler], so we will end up with https://example.com/15/profile.
 class PathEntryHandler extends UrlEntryHandler<Path> {
   @override
   Type get entryType => Path;
@@ -86,6 +110,8 @@ class PathEntryHandler extends UrlEntryHandler<Path> {
   }
 }
 
+/// The [QueryEntryHandler] will add given [Query] entries the the end of the URL in a
+/// given order.
 class QueryEntryHandler extends UrlEntryHandler<Query> {
   @override
   Type get entryType => Query;

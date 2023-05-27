@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:http_rest/http_rest.dart';
 import 'package:http_rest/http_rest_converter.dart';
 import 'package:http_rest/http_rest_io.dart';
 import 'package:http_rest/http_rest_middleware.dart';
@@ -49,6 +50,8 @@ import 'package:http_rest/http_rest_request_executor.dart';
 /// middlewares.
 ///
 /// Here is an example on how to build a [HttpRestClient]
+///
+/// ```dart
 /// final HttpRestClient client =
 ///       HttpRestClient.builder(DefaultRequestExecutor(Client()))
 ///           .addRequestConverter(MapToJsonRequestConverter())
@@ -63,8 +66,6 @@ import 'package:http_rest/http_rest_request_executor.dart';
 /// for more check the [HttpRest_converter].
 /// There are default logging middlewares for requests and responses which ships with
 /// the library, see [RequestLogger] and [ResponseLogger].
-///
-///
 class HttpRestClient {
   HttpRestClient._(this._requestExecutor);
 
@@ -128,7 +129,7 @@ class HttpRestClient {
       return converter;
     } else {
       throw Exception(
-          'RequestConverter is not specified in the client for type $converterType');
+          'RequestConverter is not specified in the [$runtimeType] client for type $converterType');
     }
   }
 
@@ -141,12 +142,15 @@ class HttpRestClient {
       return converter;
     } else {
       throw Exception(
-          'ResponseConverter is not specified in the client for type $converterType');
+          'ResponseConverter is not specified in the [$runtimeType] client for type $converterType');
     }
   }
 }
 
-// Starting point
+/// This class allows to config and build a [HttpRestClient].
+/// Use [HttpRestClient.builder] method to build a client, [HttpRestClientBuilder] allows to
+/// add multiple request and response [Middleware]s, [RequestConverter]s, [ResponseConverter]s, also
+/// configure the client with a custom [RequestExecutor].
 class HttpRestClientBuilder {
   HttpRestClientBuilder._(RequestExecutor requestExecutor) {
     _client = HttpRestClient._(requestExecutor);
@@ -183,7 +187,7 @@ class HttpRestClientBuilder {
   /// Call this method at the end of the [HttpRestClient] configuration to get
   /// the [HttpRestClient]'s instance.
   HttpRestClient build() {
-    // add
+    // Add the tail middlewares.
     _client._responseMiddleware.addNext(Middleware());
     _client._requestMiddleware.addNext(Middleware());
     return _client;

@@ -1,49 +1,6 @@
-import 'dart:io';
-
 import 'package:http/http.dart';
-import 'package:http_rest/http_rest.dart';
 import 'package:http/http.dart' as http;
-
-final httpClient = HttpRestClient.builder(DefaultRequestExecutor(http.Client()))
-    .addResponseConverter(JsonToMapResponseConverter()) // Request converters
-    .addRequestConverter(MapToJsonRequestConverter()) // Response converters
-    .addRequestMiddleware(AuthorizationMiddleware())
-    .addRequestMiddleware(RequestLogger()) // Middlewares
-    .addResponseMiddleware(ResponseLogger())
-    .build();
-
-void main() async {
-  // final result = await httpClient.execute(HttpRestRequest(
-  //     method: Methods.get,
-  //     responseConverterType: JsonToMapResponseConverter,
-  //     url: 'https://my-json-server.typicode.com/RobertApikyan/JsonData/profile'));
-}
-
-void _postRequest() async {
-  final httpClient = HttpRestClient.builder(
-          DefaultRequestExecutor(http.Client()))
-      .addResponseConverter(JsonToMapResponseConverter()) // Request converters
-      .addRequestConverter(MapToJsonRequestConverter()) // Response converters
-      .addRequestMiddleware(AuthorizationMiddleware())
-      .addRequestMiddleware(RequestLogger()) // Middlewares
-      .addResponseMiddleware(ResponseLogger())
-      .build();
-
-  // This request will add a book to library
-  final result = await httpClient.execute(HttpRestRequest(
-      method: Methods.post,
-      // Specifies request converter type
-      requestConverterType: MapToJsonRequestConverter,
-      // Specifies response converter type
-      responseConverterType: JsonToMapResponseConverter,
-      url: 'https://example.com/books',
-      headers: {'Language': 'en'},
-      body: {"id": 2, "bookName": "1984", "author": "George Orwell"}));
-
-  if (result.rowResponse.code == 201) {
-    print(result.response); // instance of Map
-  }
-}
+import 'package:http_rest/http_rest.dart';
 
 class AuthorizationMiddleware extends Middleware<RowRequest> {
   @override
@@ -54,27 +11,78 @@ class AuthorizationMiddleware extends Middleware<RowRequest> {
   }
 }
 
-void _logParts() {
-  final httpClient =
-      HttpRestClient.builder(DefaultRequestExecutor(http.Client()))
-          .addRequestMiddleware(RequestLogger(
-              logParts: {LogParts.url, LogParts.headers})) // Middlewares
-          .addResponseMiddleware(
-              ResponseLogger(logParts: {LogParts.url, LogParts.headers}))
-          .build();
+class BooksAPI {
+  final client = HttpRestClient.builder(DefaultRequestExecutor(http.Client()))
+      .addResponseConverter(JsonToMapResponseConverter()) // Response Middleware
+      .addResponseConverter(StringResponseConverter()) // Response Middleware
+      .addRequestConverter(MapToJsonRequestConverter()) // Request converters
+      .addRequestMiddleware(AuthorizationMiddleware()) // Request Middleware
+      .addRequestMiddleware(RequestLogger()) // Request Middleware
+      .addResponseMiddleware(ResponseLogger()) // Response Middlewares
+      .build();
+
+  UrlBuilder get _baseUrl => UrlBuilder.base(
+      'https://my-json-server.typicode.com/RobertApikyan/JsonData/');
+
+  // POST
+  HttpRestRequest addBook(
+          {required int id,
+          required String bookName,
+          required String author}) =>
+      HttpRestRequest(
+          method: Methods.post,
+          requestConverterType: MapToJsonRequestConverter,
+          // Specifies request converter type
+          responseConverterType: JsonToMapResponseConverter,
+          // Specifies response converter type
+          url: _baseUrl.url('books').toString(),
+          headers: {'Language': 'en'},
+          body: {"id": id, "bookName": bookName, "author": author});
+
+  // GET
+  HttpRestRequest getBooks() => HttpRestRequest(
+      method: Methods.get,
+      requestConverterType: MapToJsonRequestConverter,
+      // Specifies request converter type
+      responseConverterType: JsonToMapResponseConverter,
+      // Specifies response converter type
+      url: _baseUrl.url('books').toString(),
+      headers: {'Language': 'en'});
+
+  // POST MULTIPART
+  HttpRestRequest uploadBook(MultipartFile multipartFile,
+          HttpMultipartRequestProgressListener progressListener) =>
+      HttpRestRequest(
+        method: Methods.post,
+        responseConverterType: JsonToMapResponseConverter,
+        url: 'book',
+        headers: {'Language': 'en'},
+        body: MultipartRequestBody(
+          fields: {},
+          files: [multipartFile],
+          progressListener: progressListener,
+        ),
+      );
 }
 
-void uploadBook(MultipartFile multipartFile) =>
-    httpClient.execute(HttpRestRequest(
-      responseConverterType: StringResponseConverter,
-      method: Methods.post,
-      url: 'https://example.come/book',
-      headers: {'Language': 'en'},
-      body: MultipartRequestBody(
-        fields: {},
-        files: [multipartFile],
-        progressListener: (bytes, totalBytes) {
-          // watch the progress
-        },
-      ),
-    ));
+void main() async {
+  final booksApi = BooksAPI();
+  final booksResult = await booksApi.client.execute(booksApi.getBooks());
+  if (booksResult.rowResponse.code == 200) {
+    print(booksResult.response.toString());
+  }
+
+  final createBookResult = await booksApi.client.execute(booksApi.addBook(
+      id: 1,
+      bookName: 'UNIX Network Programming',
+      author: 'W. Richard Stevens'));
+  if (createBookResult.rowResponse.code == 201) {
+    print(booksResult.response.toString());
+  }
+
+  // final uploadBookResult = await booksApi.client.execute(booksApi.uploadBook(
+  //     await MultipartFile.fromPath('file', File('yourFilePath').path,
+  //         filename: 'UNIX Network Programming.pdf',
+  //         contentType: MediaType('video', 'webm')),
+  //     (bytes, totalBytes) {}));
+}
