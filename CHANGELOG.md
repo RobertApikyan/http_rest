@@ -6,3 +6,7 @@
 * Multipart requests with progress
 * Request/Response logger
 
+## 1.0.0-alpha.2
+
+* Removed redundant imports.
+* Shortened pubspec.yaml description up until 180 chars.
