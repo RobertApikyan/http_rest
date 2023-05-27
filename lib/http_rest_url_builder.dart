@@ -1,5 +1,4 @@
 
-
 class _HttpRestUrlBuilder {
   late final String _base;
   late final String _url;

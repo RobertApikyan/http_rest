@@ -1,10 +1,6 @@
 import 'dart:async';
 
 import 'package:http_rest/http_rest.dart';
-import 'package:http_rest/http_rest_converter.dart';
-import 'package:http_rest/http_rest_io.dart';
-import 'package:http_rest/http_rest_middleware.dart';
-import 'package:http_rest/http_rest_request_executor.dart';
 
 /// The `HttpRestClient ` class acts as the central hub, coordinating the flow of
 /// requests and responses, and allowing for extensibility and customization at
@@ -81,10 +77,8 @@ class HttpRestClient {
   final Map<Type, RequestConverter> _requestConverters = {};
   final Map<Type, ResponseConverter> _responseConverters = {};
   final RequestExecutor _requestExecutor;
-  final Middleware<RowRequest> _requestMiddleware =
-      Middleware<RowRequest>();
-  final Middleware<RowResponse> _responseMiddleware =
-      Middleware<RowResponse>();
+  final Middleware<RowRequest> _requestMiddleware = Middleware<RowRequest>();
+  final Middleware<RowResponse> _responseMiddleware = Middleware<RowResponse>();
 
   /// Use this method to execute requests,
   /// Receives a single argument of [HttpRestRequest], which represents the requests
@@ -102,10 +96,11 @@ class HttpRestClient {
   /// [ResponseConverter.fromRow] converts the [RowRequest] to [HttpRestRequest].
   /// eventually returns the result.
   Future<HttpRestResponse> execute(HttpRestRequest request) async {
+    RequestConverter requestConverter =
+        _requestConverterForType(request.requestConverterType);
 
-    RequestConverter requestConverter = _requestConverterForType(request.requestConverterType);
-
-    ResponseConverter responseConverter = _responseConverterForType(request.responseConverterType);
+    ResponseConverter responseConverter =
+        _responseConverterForType(request.responseConverterType);
 
     RowRequest? rowRequest = requestConverter.toRow(request);
 
@@ -121,7 +116,7 @@ class HttpRestClient {
   }
 
   RequestConverter _requestConverterForType(Type? converterType) {
-    if(converterType == null){
+    if (converterType == null) {
       return RequestConverter.empty();
     }
     RequestConverter? converter = _requestConverters[converterType];
@@ -134,7 +129,7 @@ class HttpRestClient {
   }
 
   ResponseConverter _responseConverterForType(Type? converterType) {
-    if(converterType == null){
+    if (converterType == null) {
       return ResponseConverter.empty();
     }
     ResponseConverter? converter = _responseConverters[converterType];

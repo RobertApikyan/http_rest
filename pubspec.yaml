@@ -1,9 +1,7 @@
 name: http_rest
-description: a powerful networking library based on Flutter's "http" package. 
-  It simplifies and enhances HTTP interactions in your Flutter applications, 
-  offering lightweight versatility and additional tools.
+description: A robust networking library for Dart and Flutter, simplifies HTTP interactions, provides tools for lightweight versatility.
 
-version: 1.0.0-alpha.1
+version: 1.0.0-alpha.2
 homepage: https://github.com/RobertApikyan/http_rest
 repository: https://github.com/RobertApikyan/http_rest
 
