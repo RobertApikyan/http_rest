@@ -10,3 +10,7 @@
 
 * Removed redundant imports.
 * Shortened pubspec.yaml description up until 180 chars.
+
+## 1.0.0-alpha.3
+
+* README minor changes.
