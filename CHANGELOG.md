@@ -14,3 +14,5 @@
 ## 1.0.0-alpha.3
 
 * README minor changes.
+
+## 1.0.0-alpha.4

@@ -89,7 +89,7 @@ Any number of request and response Middlewares can be added to `HttpRestClient`,
 
 ## Converters
 
-Converters are used to convert request and response bodies. Library sheep with a few default converters 
+Converters are used to convert request and response bodies. Library ships with a few default converters 
 
 `MapToJsonRequestConverter` used to convert request's map body to JSON string.
 `JsonToMapResponseConverter` used to convert response body bytes to map object.
