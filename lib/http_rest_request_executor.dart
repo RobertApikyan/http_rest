@@ -96,7 +96,7 @@ class DefaultRequestExecutor extends RequestExecutor {
         case Methods.delete:
           response = await _withTimeOut(client._deleteWithBody(uri,
               headers: rowRequest.request.headers,
-              body: (rowRequest.request.body ?? "") as String));
+              body: (rowRequest.rowBody ?? "") as String));
           break;
         case Methods.patch:
           response = await _withTimeOut(client.patch(uri,
