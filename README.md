@@ -5,8 +5,10 @@ HTTP REST provides all the necessary tools to simplify and streamline your HTTP 
 
 * Middlewares (Interceptors)
 * Request/Response body converters
-* Multipart requests with progress
 * Request/Response logger
+* Read/Write progress tracking
+* Multipart requests with progress
+
 
 ## Getting Started
 
@@ -181,6 +183,21 @@ By default, all the parts of the request and response are logged. Here is how to
       .addResponseMiddleware(ResponseLogger(logParts: {LogParts.url,LogParts.headers}))
       .build();
 ```
+
+## Read/Write Progress Tracking
+
+To track the read/write progress of any request use `writeProgressListener` and `readProgressListener` members of `HttpRestRequest`.
+
+Here is an example of tracking image download progress from GitHub.
+
+```dart
+void downloadImage() =>
+    httpClient.execute(HttpRestRequest(
+      method: Methods.get,
+      url: 'https://raw.githubusercontent.com/RobertApikyan/http_rest/main/doc/assets/intro.png',
+      readProgressListener: (bytes, totalBytes) => print('download progress= ${bytes/totalBytes}'),
+    ));
+``` 
 
 ## Multipart Request
 
