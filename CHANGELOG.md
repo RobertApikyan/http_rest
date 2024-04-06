@@ -17,6 +17,6 @@
 
 ## 1.0.0-alpha.4
 
-## 1.0.1 
+## 1.1.0
 
 * Added addRequestOverrideMiddleware method to HttpRestClientBuilder, so each request will be streamed through the provided middleware before passing to request converter.
