@@ -74,6 +74,8 @@ class HttpRestClient {
   static HttpRestClientBuilder builder(RequestExecutor requestExecutor) =>
       HttpRestClientBuilder._(requestExecutor);
 
+  final Middleware<HttpRestRequest> _requestOverrideMiddleware =
+  Middleware<HttpRestRequest>();
   final Map<Type, RequestConverter> _requestConverters = {};
   final Map<Type, ResponseConverter> _responseConverters = {};
   final RequestExecutor _requestExecutor;
@@ -96,6 +98,9 @@ class HttpRestClient {
   /// [ResponseConverter.fromRow] converts the [RowRequest] to [HttpRestRequest].
   /// eventually returns the result.
   Future<HttpRestResponse> execute(HttpRestRequest request) async {
+
+    request = await _requestOverrideMiddleware.next(request);
+
     RequestConverter requestConverter =
         _requestConverterForType(request.requestConverterType);
 
@@ -165,6 +170,15 @@ class HttpRestClientBuilder {
     return this;
   }
 
+  /// Use this method to add request override middlewares to [HttpRestClient],
+  /// Will override stream each request through provided middleware before passing it
+  /// to requrest converter (@see [addRequestConverter])
+  HttpRestClientBuilder addRequestOverrideMiddleware(
+      Middleware<HttpRestRequest> middleware) {
+    _client._requestOverrideMiddleware.addNext(middleware);
+    return this;
+  }
+
   /// Use this method to add request middlewares to [HttpRestClient]
   HttpRestClientBuilder addRequestMiddleware(
       Middleware<RowRequest> middleware) {
@@ -183,6 +197,7 @@ class HttpRestClientBuilder {
   /// the [HttpRestClient]'s instance.
   HttpRestClient build() {
     // Add the tail middlewares.
+    _client._requestOverrideMiddleware.addNext(Middleware());
     _client._responseMiddleware.addNext(Middleware());
     _client._requestMiddleware.addNext(Middleware());
     return _client;
