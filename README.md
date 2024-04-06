@@ -240,6 +240,8 @@ The `HttpRestClient ` class acts as the central hub, coordinating the flow of re
 
 When a request is made through the HttpRestClient, the following steps occur:
 
+1. **Request Override Middleware**: The request is streamed through the provided middleware before passing to request converter, thereby let to modify each request in the initial step before passing to converter. 
+
 1. **Request Conversion**: The request object is passed through the request converter, which transforms it into the appropriate format for sending over the network. This ensures compatibility with the API endpoint and handles any necessary data conversions.
 
 2. **Request Middlewares**: The converted request then goes through a chain of request middlewares. These middlewares allow you to inject custom logic before the request is sent. Examples of request middleware functionalities include authentication, adding headers, or modifying the request payload.
