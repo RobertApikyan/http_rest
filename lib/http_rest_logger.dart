@@ -6,7 +6,6 @@ import 'http_rest_io.dart';
 import 'http_rest_method.dart';
 import 'http_rest_middleware.dart';
 
-
 /// This enum can be used to specify which part of the request need to logged
 /// by [RequestLogger] and [ResponseLogger]
 enum LogParts {
@@ -17,6 +16,8 @@ enum LogParts {
 
   static const all = {url, headers, code, body};
 }
+
+typedef LoggingInterceptor = Future<void> Function(List<String> buffer);
 
 /// The [RequestLogger] is a default logger implementation for the requests.
 /// Here is how the logged request's structure looks like.
@@ -40,34 +41,35 @@ enum LogParts {
 ///  -------------------------------------------------------------------------------------------------------------------
 /// The [RequestLogger] is a descendant of [Middleware], you can derive from
 /// the [Middleware] and create you own request logger.
-class RequestLogger extends Middleware<RowRequest> {
-  RequestLogger({this.logParts = LogParts.all});
+class RequestLogger extends Middleware<RowRequest> with _RestLoggerMixin {
+  RequestLogger({this.logParts = LogParts.all, this.loggingInterceptor});
 
   final Set<LogParts> logParts;
+  @override
+  final LoggingInterceptor? loggingInterceptor;
 
   @override
-  Future<RowRequest> onNext(
-      RowRequest row, Middleware<RowRequest> nextMiddleware) async {
+  Future<RowRequest> onNext(RowRequest row, Middleware<RowRequest> nextMiddleware) async {
     final request = row.request;
     final rowBody = row.rowBody;
 
-    log('');
-    logDivider();
-    tabbedLog('→ REQUEST →');
+    await _log('', collect: true);
+    await _log(_divider, collect: true);
+    await _log('→ REQUEST →', collect: true);
 
     if (logParts.contains(LogParts.url)) {
-      _logUrl(request.method, request.url);
+      await _logUrl(request.method, request.url);
     }
 
     if (logParts.contains(LogParts.headers)) {
-      _logHeaders(request.headers);
+      await _logHeaders(request.headers);
     }
 
     if (logParts.contains(LogParts.body)) {
-      _logBody(rowBody);
+      await _logBody(rowBody);
     }
 
-    logDivider();
+    await _log(_divider, collect: false);
 
     return await nextMiddleware.next(row);
   }
@@ -101,33 +103,33 @@ class RequestLogger extends Middleware<RowRequest> {
 ///  -------------------------------------------------------------------------------------------------------------------
 /// The [ResponseLogger] is a descendant of [Middleware], you can derive from
 /// the [Middleware] and create you own response logger.
-class ResponseLogger extends Middleware<RowResponse> {
-  ResponseLogger({this.logParts = LogParts.all});
+class ResponseLogger extends Middleware<RowResponse> with _RestLoggerMixin {
+  ResponseLogger({this.logParts = LogParts.all, this.loggingInterceptor});
 
   final Set<LogParts> logParts;
+  @override
+  final LoggingInterceptor? loggingInterceptor;
 
   @override
-  Future<RowResponse> onNext(RowResponse row,
-      Middleware<RowResponse> nextMiddleware) async {
-    log('');
-    logDivider();
-
-    tabbedLog('← RESPONSE ←');
+  Future<RowResponse> onNext(RowResponse row, Middleware<RowResponse> nextMiddleware) async {
+    await _log('', collect: true);
+    await _log(_divider, collect: true);
+    await _log('← RESPONSE ←', collect: true);
 
     if (logParts.contains(LogParts.url)) {
       final request = row.request;
-      _logUrl(request.method, request.url);
+      await _logUrl(request.method, request.url);
     }
 
     if (logParts.contains(LogParts.code)) {
       final code = row.code;
       if (code != null) {
-        tabbedLog('CODE: $code');
+        await _log('CODE: $code', collect: true);
       }
     }
 
     if (logParts.contains(LogParts.headers)) {
-      _logHeaders(row.headers ?? {});
+      await _logHeaders(row.headers ?? {});
     }
 
     if (logParts.contains(LogParts.body)) {
@@ -137,42 +139,55 @@ class ResponseLogger extends Middleware<RowResponse> {
       } on Exception {
         //ignore
       }
-      _logBody(textBody ?? row.bodyBytes);
+      await _logBody(textBody ?? row.bodyBytes);
     }
 
-    logDivider();
+    await _log(_divider, collect: false);
 
     return await nextMiddleware.next(row);
   }
 }
 
-void _logUrl(Methods method, String url) {
-  String endpoint = '${method.name.toString().toUpperCase()}: $url';
-  tabbedLog(endpoint);
-}
+mixin _RestLoggerMixin {
+  final _divider =
+      '-------------------------------------------------------------------------------------------------------------------';
+  abstract final LoggingInterceptor? loggingInterceptor;
+  List<String> messageBuffer = [];
 
-void _logHeaders(Map<String, String> headers) {
-  String headerLogs = '';
-  for (var headerKey in headers.keys) {
-    headerLogs += '$headerKey : ${headers[headerKey]}\n\t\t\t\t';
+  Future<void> _logUrl(Methods method, String url) async {
+    String endpoint = '${method.name.toString().toUpperCase()}: $url';
+    await _log(endpoint, collect: true);
   }
-  tabbedLog("HEADERS:\t$headerLogs");
-}
 
-void _logBody(dynamic rowBody) {
-  String body = rowBody is Uint8List
-      ? 'Bytes(${rowBody.length})'
-      : rowBody?.toString() ?? '';
-  if (body.isEmpty) {
-    tabbedLog('BODY:\tEMPTY');
-  } else {
-    tabbedLog('BODY:\n\t$body');
+  Future<void> _logHeaders(Map<String, String> headers) async {
+    String headerLogs = '';
+    for (var headerKey in headers.keys) {
+      headerLogs += '$headerKey : ${headers[headerKey]}\n\t\t\t\t';
+    }
+    await _log("HEADERS:\t$headerLogs", collect: true);
+  }
+
+  Future<void> _logBody(dynamic rowBody) async {
+    String body = rowBody is Uint8List ? 'Bytes(${rowBody.length})' : rowBody?.toString() ?? '';
+    if (body.isEmpty) {
+      await _log('BODY:\tEMPTY', collect: true);
+    } else {
+      await _log('BODY:\n\t$body', collect: true);
+    }
+  }
+
+  Future<void> _log(String message, {required bool collect}) async {
+    if (collect) {
+      messageBuffer.add(message);
+    } else {
+      if (loggingInterceptor case LoggingInterceptor interceptor) {
+        await interceptor([...messageBuffer]);
+      } else {
+        for (var message in messageBuffer) {
+          log(message);
+        }
+      }
+      messageBuffer.clear();
+    }
   }
 }
-
-const divider =
-    '-------------------------------------------------------------------------------------------------------------------';
-
-void logDivider() => tabbedLog(divider);
-
-void tabbedLog(String message) => log(message);
